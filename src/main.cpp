@@ -11,7 +11,7 @@ int sensorPowerPin = 4;
 int wifiResetPin = 9;
 int soilMoisturePin = 14;
 int sleepCount = 0;
-int sleepAmount = 2;
+int sleepAmount = 10;
 
 Dht11Sensor dht11Sensor(&DHT11Pin);
 SoilMoistureSensor soilMoistureSensor(soilMoisturePin);
