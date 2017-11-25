@@ -3,27 +3,28 @@
 String JsonService::convertSensorReadingsToJson(SensorReading sensorReading)
 {
     String jsonMessage;
-    DynamicJsonBuffer buffer(100);
+    DynamicJsonBuffer jsonBuffer(300);
 
-    JsonObject &reading = buffer.createObject();
+    JsonObject &reading = jsonBuffer.createObject();
     reading["soilMoisture"] = sensorReading.soilMoisture;
     reading["waterLevel"] = sensorReading.waterLevel;
     reading["waterLevelUnit"] = sensorReading.waterLevelUnit;
     reading["humidity"] = sensorReading.humidity;
     reading["temperature"] = sensorReading.temperature;
-    reading["temperatureUnit"] = sensorReading.temperatureUnit;
     reading["dht11ErrorCode"] = sensorReading.dht11ErrorCode;
-
+    reading["temperatureUnit"] = sensorReading.temperatureUnit;
+    
     reading.printTo(jsonMessage);
+
     return jsonMessage;
 }
 
 String JsonService::convertConfigToJson(Configuration configuration)
 {
     String jsonMessage;
-    DynamicJsonBuffer buffer(200);
+    DynamicJsonBuffer jsonBuffer(250);
 
-    JsonObject &config = buffer.createObject();
+    JsonObject &config = jsonBuffer.createObject();
     config["measuringInterval"] = configuration.measuringInterval;
     config["wateringTime"] = configuration.wateringTime;
     config["smtpPort"] = configuration.smtpPort;

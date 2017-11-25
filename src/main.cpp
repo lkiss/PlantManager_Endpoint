@@ -8,10 +8,8 @@ int waterPumpPin = 6;
 int waterSensorEchoPin = 7;
 int waterSensorTriggerPin = 8;
 int sensorPowerPin = 4;
-int wifiResetPin = 9;
 int soilMoisturePin = 14;
-int sleepCount = 0;
-int sleepAmount = 10;
+int wakeUpPin = 1;
 
 Dht11Sensor dht11Sensor(&DHT11Pin);
 SoilMoistureSensor soilMoistureSensor(soilMoisturePin);
@@ -24,39 +22,64 @@ ConfigService configService;
 DataService dataService(configService, jsonService);
 SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoistureSensor, dht11Sensor);
 
+void wakeUp()
+{
+}
+
 void setup()
 {
   pinMode(sensorPowerPin, OUTPUT);
-  pinMode(wifiResetPin, OUTPUT);
-  digitalWrite(wifiResetPin, HIGH);
+  pinMode(wakeUpPin, INPUT);
 }
 
 void loop()
 {
-  if (sleepCount != 0 && sleepCount != sleepAmount)
-  {
-    sleepCount++;
-    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
-    return;
-  }
+  // if (wakeUpCode == 49)
+  // {
+  //   Serial.end();
+  //   Serial.begin(9600);
+  //   digitalWrite(sensorPowerPin, HIGH);
 
-  sleepCount = 0;
+  //   SensorReading reading = sensorService.getSensorReadings();
+  //   sensorService.water(reading);
 
-  digitalWrite(wifiResetPin, LOW);
-  delay(50);
-  digitalWrite(wifiResetPin, HIGH);
+  //   Serial.println(jsonService.convertSensorReadingsToJson(reading));
+  //   Serial.flush();
 
-  Serial.begin(9600);
+  //   digitalWrite(sensorPowerPin, LOW);
+  //   Serial.end();
+
+  //   attachInterrupt(wakeUpPin, wakeUp, LOW);
+  //   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+  //   detachInterrupt(wakeUpPin);
+
+  //   Serial.begin(9600);
+  // }
 
   digitalWrite(sensorPowerPin, HIGH);
+
   SensorReading reading = sensorService.getSensorReadings();
   sensorService.water(reading);
 
-  Serial.print(jsonService.convertSensorReadingsToJson(reading));
-
   digitalWrite(sensorPowerPin, LOW);
+
+  Serial.begin(9600);
+  while (Serial.available() == 0 && Serial.read() != 49)
+  {
+  }
+
+  Serial.print(jsonService.convertSensorReadingsToJson(reading));
   Serial.end();
 
-  sleepCount++;
-  LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+  attachInterrupt(wakeUpPin, wakeUp, LOW);
+  LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+  detachInterrupt(wakeUpPin);
 }
+
+// void serialEvent()
+// {
+//   while (Serial.available())
+//   {
+//     wakeUpCode = Serial.read();
+//   }
+// }
