@@ -22,10 +22,6 @@ ConfigService configService;
 DataService dataService(configService, jsonService);
 SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoistureSensor, dht11Sensor);
 
-void wakeUp()
-{
-}
-
 void setup()
 {
   pinMode(sensorPowerPin, OUTPUT);
@@ -34,28 +30,6 @@ void setup()
 
 void loop()
 {
-  // if (wakeUpCode == 49)
-  // {
-  //   Serial.end();
-  //   Serial.begin(9600);
-  //   digitalWrite(sensorPowerPin, HIGH);
-
-  //   SensorReading reading = sensorService.getSensorReadings();
-  //   sensorService.water(reading);
-
-  //   Serial.println(jsonService.convertSensorReadingsToJson(reading));
-  //   Serial.flush();
-
-  //   digitalWrite(sensorPowerPin, LOW);
-  //   Serial.end();
-
-  //   attachInterrupt(wakeUpPin, wakeUp, LOW);
-  //   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
-  //   detachInterrupt(wakeUpPin);
-
-  //   Serial.begin(9600);
-  // }
-
   digitalWrite(sensorPowerPin, HIGH);
 
   SensorReading reading = sensorService.getSensorReadings();
@@ -75,11 +49,3 @@ void loop()
   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
   detachInterrupt(wakeUpPin);
 }
-
-// void serialEvent()
-// {
-//   while (Serial.available())
-//   {
-//     wakeUpCode = Serial.read();
-//   }
-// }
