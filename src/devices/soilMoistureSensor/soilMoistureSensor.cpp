@@ -12,7 +12,7 @@ bool SoilMoistureSensor::isDry()
 {
   int sensorReading = this->read();
 
-  if (sensorReading >= this->soilMoistureDryTreshold)
+  if (sensorReading >= this->soilMoistureWetTreshold)
   {
     return true;
   }
@@ -21,7 +21,7 @@ bool SoilMoistureSensor::isDry()
 
 bool SoilMoistureSensor::isDry(int soilMoistureValue)
 {
-  if (soilMoistureValue >= this->soilMoistureDryTreshold)
+  if (soilMoistureValue >= this->soilMoistureWetTreshold)
   {
     return true;
   }

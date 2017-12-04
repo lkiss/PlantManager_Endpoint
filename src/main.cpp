@@ -22,6 +22,8 @@ ConfigService configService;
 DataService dataService(configService, jsonService);
 SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoistureSensor, dht11Sensor);
 
+void wakeUp(){}
+
 void setup()
 {
   pinMode(sensorPowerPin, OUTPUT);
@@ -42,7 +44,7 @@ void loop()
   {
   }
 
-  Serial.print(jsonService.convertSensorReadingsToJson(reading));
+  Serial.print(jsonService.convertSensorReadingsToJson(reading, configService.getConfiguration()));
   Serial.end();
 
   attachInterrupt(wakeUpPin, wakeUp, LOW);

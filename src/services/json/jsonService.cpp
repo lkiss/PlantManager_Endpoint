@@ -1,11 +1,16 @@
 #include "./jsonService.h"
 
-String JsonService::convertSensorReadingsToJson(SensorReading sensorReading)
+String JsonService::convertSensorReadingsToJson(SensorReading sensorReading, Configuration configuration)
 {
     String jsonMessage;
-    DynamicJsonBuffer jsonBuffer(300);
+    DynamicJsonBuffer readingBuffer(300);
+    DynamicJsonBuffer sensorBuffer(100);
 
-    JsonObject &reading = jsonBuffer.createObject();
+    JsonObject &sensor = sensorBuffer.createObject();
+    JsonObject &reading = readingBuffer.createObject();
+
+    sensor["id"] = configuration.sensorId;
+
     reading["soilMoisture"] = sensorReading.soilMoisture;
     reading["waterLevel"] = sensorReading.waterLevel;
     reading["waterLevelUnit"] = sensorReading.waterLevelUnit;
@@ -13,6 +18,7 @@ String JsonService::convertSensorReadingsToJson(SensorReading sensorReading)
     reading["temperature"] = sensorReading.temperature;
     reading["dht11ErrorCode"] = sensorReading.dht11ErrorCode;
     reading["temperatureUnit"] = sensorReading.temperatureUnit;
+    reading["sensor"] = sensor;
     
     reading.printTo(jsonMessage);
 
@@ -25,14 +31,6 @@ String JsonService::convertConfigToJson(Configuration configuration)
     DynamicJsonBuffer jsonBuffer(250);
 
     JsonObject &config = jsonBuffer.createObject();
-    config["measuringInterval"] = configuration.measuringInterval;
-    config["wateringTime"] = configuration.wateringTime;
-    config["smtpPort"] = configuration.smtpPort;
-    config["smtpServer"] = configuration.smtpServer;
-    config["emailTo"] = configuration.emailTo;
-    config["emailFrom"] = configuration.emailFrom;
-    config["emailSubject"] = configuration.emailSubject;
-    config["emailBody"] = configuration.emailBody;
 
     config.printTo(jsonMessage);
 
@@ -46,17 +44,6 @@ Configuration JsonService::convertJsonToConfig(String configJson)
     DynamicJsonBuffer buffer(200);
 
     JsonObject &config = buffer.parseObject(configJson);
-
-    configuration.measuringInterval = config["measuringInterval"];
-    configuration.wateringTime = config["wateringTime"];
-    configuration.smtpPort = config["smtpPort"];
-    configuration.smtpServer = config["smtpServer"].as<String>();
-    configuration.base64UserId = config["base64UserId"].as<String>();
-    configuration.base64Password = config["base64Password"].as<String>();
-    configuration.emailTo = config["emailTo"].as<String>();
-    configuration.emailFrom = config["emailFrom"].as<String>();
-    configuration.emailSubject = config["emailSubject"].as<String>();
-    configuration.emailBody = config["emailBody"].as<String>();
 
     return configuration;
 }
