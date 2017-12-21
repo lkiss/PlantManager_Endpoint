@@ -14,7 +14,7 @@ private:
 public:
   DataService(ConfigService configService, JsonService jsonService);
   int sendSensorReadings(SensorReading reading);
-  void getConfigurationFromServer();
+  Configuration getConfigurationFromServer();
 };
 
 #endif

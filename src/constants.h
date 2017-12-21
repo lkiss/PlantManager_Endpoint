@@ -12,6 +12,11 @@ enum WaterTankType
     CUBE = 2
 };
 
+enum DeviceType{
+    TYPE01 = 0,
+    TYPE02 = 1
+};
+
 enum TemperatureUnitOfMeasure
 {
     FAHRENHEIT = 0,

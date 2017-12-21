@@ -6,7 +6,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}",
             "name": "PlatformIO Debugger",
-            "target": "c:/Repositories/PlantManager_Endpoint/.pioenvs/nanoatmega328/firmware.elf",
+            "target": "c:/Repositories/PlantManager_Endpoint/.pioenvs/pro16MHzatmega328/firmware.elf",
             "gdbpath": "C:/Users/kissl/.platformio/penv/Scripts/piodebuggdb",
             "autorun": [ "source .pioinit" ]
         }

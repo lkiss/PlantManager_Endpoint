@@ -4,6 +4,7 @@
 struct Configuration
 {
   String sensorId;
+  String sensorType;
 };
 
 #endif

@@ -14,6 +14,9 @@ int DataService::sendSensorReadings(SensorReading reading)
     return 200;
 }
 
-void DataService::getConfigurationFromServer()
+Configuration DataService::getConfigurationFromServer()
 {
+    Configuration config = this->configurationService.getConfiguration();
+
+    return config;
 }

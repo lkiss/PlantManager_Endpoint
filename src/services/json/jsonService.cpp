@@ -1,15 +1,11 @@
 #include "./jsonService.h"
 
-String JsonService::convertSensorReadingsToJson(SensorReading sensorReading, Configuration configuration)
+char* JsonService::convertSensorReadingsToJson(SensorReading sensorReading, Configuration configuration)
 {
-    String jsonMessage;
-    DynamicJsonBuffer readingBuffer(300);
-    DynamicJsonBuffer sensorBuffer(100);
+    char jsonBuffer[325];
+    DynamicJsonBuffer readingBuffer(325);
 
-    JsonObject &sensor = sensorBuffer.createObject();
     JsonObject &reading = readingBuffer.createObject();
-
-    sensor["id"] = configuration.sensorId;
 
     reading["soilMoisture"] = sensorReading.soilMoisture;
     reading["waterLevel"] = sensorReading.waterLevel;
@@ -18,11 +14,13 @@ String JsonService::convertSensorReadingsToJson(SensorReading sensorReading, Con
     reading["temperature"] = sensorReading.temperature;
     reading["dht11ErrorCode"] = sensorReading.dht11ErrorCode;
     reading["temperatureUnit"] = sensorReading.temperatureUnit;
-    reading["sensor"] = sensor;
-    
-    reading.printTo(jsonMessage);
 
-    return jsonMessage;
+    JsonObject& sensor = reading.createNestedObject("sensor");
+    sensor["sensorId"] = configuration.sensorId;
+
+    reading.printTo(jsonBuffer);
+
+    return jsonBuffer;
 }
 
 String JsonService::convertConfigToJson(Configuration configuration)

@@ -40,14 +40,12 @@ void loop()
   digitalWrite(sensorPowerPin, LOW);
 
   Serial.begin(9600);
-  while (Serial.available() == 0 && Serial.read() != 49)
-  {
-  }
 
-  Serial.print(jsonService.convertSensorReadingsToJson(reading, configService.getConfiguration()));
+  Serial.println(jsonService.convertSensorReadingsToJson(reading, configService.getConfiguration()));
   Serial.end();
 
   attachInterrupt(wakeUpPin, wakeUp, LOW);
+
   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
   detachInterrupt(wakeUpPin);
 }
