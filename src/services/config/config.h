@@ -3,8 +3,8 @@
 
 struct Configuration
 {
-  String sensorId;
-  String sensorType;
+  int SoilMoistureThreshold;
+  int WateringTimeInSeconds;
 };
 
 #endif

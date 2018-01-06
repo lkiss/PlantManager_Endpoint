@@ -2,8 +2,8 @@
 
 ConfigService::ConfigService()
 {
-  this->config.sensorId = "72fb5192-a399-4e74-96e1-1a40cf7f934d";
-  this->config.sensorType = TYPE01;
+  this->config.WateringTimeInSeconds = 5;
+  this->config.SoilMoistureThreshold = 750;
 }
 
 ConfigService *ConfigService::getInstance()

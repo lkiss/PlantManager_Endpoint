@@ -2,6 +2,14 @@
 #define PI 3.14159265358979323846
 #endif
 
+#ifndef SENSOR_ID
+#define SENSOR_ID "72fb5192-a399-4e74-96e1-1a40cf7f934d"
+#endif
+
+#ifndef SENSOR_TYPE
+#define SENSOR_TYPE TYPE01
+#endif
+
 #ifndef CONSTANTS
 #define CONSTANTS
 

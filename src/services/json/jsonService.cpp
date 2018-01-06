@@ -2,10 +2,10 @@
 
 char* JsonService::convertSensorReadingsToJson(SensorReading sensorReading, Configuration configuration)
 {
-    char jsonBuffer[325];
-    DynamicJsonBuffer readingBuffer(325);
+    char readingBuffer[325];
+    DynamicJsonBuffer jsonBuffer(325);
 
-    JsonObject &reading = readingBuffer.createObject();
+    JsonObject &reading = jsonBuffer.createObject();
 
     reading["soilMoisture"] = sensorReading.soilMoisture;
     reading["waterLevel"] = sensorReading.waterLevel;
@@ -16,11 +16,12 @@ char* JsonService::convertSensorReadingsToJson(SensorReading sensorReading, Conf
     reading["temperatureUnit"] = sensorReading.temperatureUnit;
 
     JsonObject& sensor = reading.createNestedObject("sensor");
-    sensor["sensorId"] = configuration.sensorId;
+    sensor["sensorId"] = SENSOR_ID;
 
-    reading.printTo(jsonBuffer);
+    reading.printTo(readingBuffer);
+    jsonBuffer.clear();
 
-    return jsonBuffer;
+    return readingBuffer;
 }
 
 String JsonService::convertConfigToJson(Configuration configuration)
@@ -31,17 +32,21 @@ String JsonService::convertConfigToJson(Configuration configuration)
     JsonObject &config = jsonBuffer.createObject();
 
     config.printTo(jsonMessage);
+    jsonBuffer.clear();
 
     return jsonMessage;
 }
 
 Configuration JsonService::convertJsonToConfig(String configJson)
 {
-    Configuration configuration = Configuration();
+    Configuration configuration;
     String jsonMessage;
     DynamicJsonBuffer buffer(200);
-
     JsonObject &config = buffer.parseObject(configJson);
+    configuration.SoilMoistureThreshold = config["SoilMoistureThreshold"];
+    configuration.WateringTimeInSeconds = config["WateringTimeInSeconds"];
+
+    buffer.clear();
 
     return configuration;
 }
