@@ -47,11 +47,10 @@ int SoilMoistureSensor::read()
   return result;
 }
 
-void SoilMoistureSensor::updateTresholdValues(int newDryTreshold, int newWetTreshold)
+void SoilMoistureSensor::updateTresholdValues(int newTreshold)
 {
-  if (this->isValidMoistureTreshold(newDryTreshold) && this->isValidMoistureTreshold(newWetTreshold))
+  if (this->isValidMoistureTreshold(newTreshold) && this->isValidMoistureTreshold(newTreshold))
   {
-    this->soilMoistureDryTreshold = newDryTreshold;
-    this->soilMoistureWetTreshold = newWetTreshold;
+    this->soilMoistureWetTreshold = newTreshold;
   }
 }

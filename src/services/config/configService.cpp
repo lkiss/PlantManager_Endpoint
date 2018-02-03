@@ -2,7 +2,7 @@
 
 ConfigService::ConfigService()
 {
-  this->config.WateringTimeInSeconds = 5;
+  this->config.WateringTime = 5;
   this->config.SoilMoistureThreshold = 750;
 }
 

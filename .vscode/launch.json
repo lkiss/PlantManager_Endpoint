@@ -4,11 +4,12 @@
         {
             "type": "gdb",
             "request": "launch",
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder}",
             "name": "PlatformIO Debugger",
             "target": "c:/Repositories/PlantManager_Endpoint/.pioenvs/pro16MHzatmega328/firmware.elf",
             "gdbpath": "C:/Users/kissl/.platformio/penv/Scripts/piodebuggdb",
-            "autorun": [ "source .pioinit" ]
+            "autorun": [ "source .pioinit" ],
+            "preLaunchTask": "PlatformIO: Pre-Debug"
         }
     ]
 }

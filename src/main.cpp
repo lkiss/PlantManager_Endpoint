@@ -25,6 +25,13 @@ SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoisture
 
 void wakeUp() {}
 
+void updateDevices(){
+  Configuration config = configService.getConfiguration();
+
+  waterPump.updateWateringTime(config.WateringTime);
+  soilMoistureSensor.updateTresholdValues(config.SoilMoistureThreshold);
+}
+
 void setup()
 {
   Serial.begin(9600);
@@ -48,6 +55,8 @@ void loop()
 
     String configString = Serial.readStringUntil('\n');
     configService.setConfigurationJson(configString);
+
+    updateDevices();
 
     digitalWrite(sensorPowerPin, HIGH);
 
