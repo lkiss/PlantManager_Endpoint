@@ -12,7 +12,7 @@ int soilMoisturePin = 14;
 int wakeUpPin = INT1;
 int wifiReadyPin = 9;
 
-Dht11Sensor dht11Sensor(&DHT11Pin);
+TemperatureSensor temperatureSensor(&DHT11Pin);
 SoilMoistureSensor soilMoistureSensor(soilMoisturePin);
 WaterPump waterPump(&waterPumpPin);
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
@@ -21,7 +21,7 @@ WaterTank waterTank(PRISM, 16, 6.5, 12);
 JsonService jsonService;
 ConfigService configService;
 DataService dataService(configService, jsonService);
-SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoistureSensor, dht11Sensor);
+SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoistureSensor, temperatureSensor);
 
 void wakeUp() {}
 

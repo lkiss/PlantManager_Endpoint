@@ -5,27 +5,27 @@ SensorService::SensorService() {}
 SensorReading SensorService::getSensorReadings()
 {
     SensorReading reading;
-    Dht11SensorReading dht11SensorReading;
+    TemperatureSensorReading temperatureSensorReading;
 
-    dht11SensorReading = this->dht11Sensor.read();
+    temperatureSensorReading = this->temperatureSensor.read();
 
     reading.soilMoisture = this->soilMoistureSensor.read();
     reading.waterLevel = this->waterTank.GetRemainingInPercentage(this->waterLevelSensor.getMissingWaterColumHeighCM());
     reading.waterLevelUnit = "%";
-    reading.humidity = dht11SensorReading.humidity;
-    reading.temperature = dht11SensorReading.temperatureInCelsius;
+    reading.humidity = temperatureSensorReading.humidity;
+    reading.temperature = temperatureSensorReading.temperatureInCelsius;
     reading.temperatureUnit = "C";
-    reading.dht11ErrorCode = dht11SensorReading.dht11ErrorCode;
+    reading.dht11ErrorCode = temperatureSensorReading.dht11ErrorCode;
 
     return reading;
 }
 
-SensorService::SensorService(const WaterTank &waterTank, const WaterLevelSensor &waterLevelSensor, const WaterPump &waterPump, const SoilMoistureSensor &soilMoistureSensor, const Dht11Sensor &dht11Sensor)
+SensorService::SensorService(const WaterTank &waterTank, const WaterLevelSensor &waterLevelSensor, const WaterPump &waterPump, const SoilMoistureSensor &soilMoistureSensor, const TemperatureSensor &temperatureSensor)
 {
     this->waterLevelSensor = waterLevelSensor;
     this->waterPump = waterPump;
     this->soilMoistureSensor = soilMoistureSensor;
-    this->dht11Sensor = dht11Sensor;
+    this->temperatureSensor = temperatureSensor;
     this->waterTank = waterTank;
 }
 

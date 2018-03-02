@@ -45,6 +45,7 @@ Configuration JsonService::convertJsonToConfig(String configJson)
     JsonObject &config = buffer.parseObject(configJson);
     configuration.SoilMoistureThreshold = config["idealSoilMoistureValue"].as<int>();
     configuration.WateringTime = (config["wateringTimeInSeconds"].as<int>()) * 1000;
+    configuration.MeasuringIntervalInMinutes = (config["measuringIntervalInMinutes"].as<int>()) * 1000 * 60;
 
     buffer.clear();
 

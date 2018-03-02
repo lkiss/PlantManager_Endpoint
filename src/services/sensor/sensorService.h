@@ -12,11 +12,11 @@ class SensorService
     WaterPump waterPump;
     SoilMoistureSensor soilMoistureSensor;
     WaterTank waterTank;
-    Dht11Sensor dht11Sensor;
+    TemperatureSensor temperatureSensor;
 
   public:
     SensorService();
-    SensorService(const WaterTank& waterTank, const WaterLevelSensor& waterLevelSensor, const WaterPump& waterPump, const SoilMoistureSensor& soilMoistureSensor, const Dht11Sensor& dht11Sensor);
+    SensorService(const WaterTank& waterTank, const WaterLevelSensor& waterLevelSensor, const WaterPump& waterPump, const SoilMoistureSensor& soilMoistureSensor, const TemperatureSensor& temperatureSensor);
     SensorReading getSensorReadings();
     bool water(SensorReading reading);
 };

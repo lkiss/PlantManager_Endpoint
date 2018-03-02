@@ -20,7 +20,8 @@ enum WaterTankType
     CUBE = 2
 };
 
-enum DeviceType{
+enum DeviceType
+{
     TYPE01 = 0,
     TYPE02 = 1
 };
