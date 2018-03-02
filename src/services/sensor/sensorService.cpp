@@ -20,7 +20,12 @@ SensorReading SensorService::getSensorReadings()
     return reading;
 }
 
-SensorService::SensorService(const WaterTank &waterTank, const WaterLevelSensor &waterLevelSensor, const WaterPump &waterPump, const SoilMoistureSensor &soilMoistureSensor, const TemperatureSensor &temperatureSensor)
+SensorService::SensorService(
+    const WaterTank &waterTank,
+    const WaterLevelSensor &waterLevelSensor,
+    const WaterPump &waterPump,
+    const SoilMoistureSensor &soilMoistureSensor,
+    const TemperatureSensor &temperatureSensor)
 {
     this->waterLevelSensor = waterLevelSensor;
     this->waterPump = waterPump;

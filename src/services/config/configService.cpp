@@ -4,6 +4,7 @@ ConfigService::ConfigService()
 {
   this->config.WateringTime = 5;
   this->config.SoilMoistureThreshold = 750;
+  this->config.MeasuringIntervalInMinutes = 1;
 }
 
 ConfigService *ConfigService::getInstance()

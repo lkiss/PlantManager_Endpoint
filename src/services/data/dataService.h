@@ -8,7 +8,7 @@
 class DataService
 {
 private:
-  ConfigService configurationService;
+  ConfigService configService;
   JsonService jsonService;
 
 public:

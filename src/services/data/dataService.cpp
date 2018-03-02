@@ -2,21 +2,21 @@
 
 DataService::DataService(ConfigService configService, JsonService jsonService)
 {
-    this->configurationService = configService;
+    this->configService = configService;
     this->jsonService = jsonService;
 }
 
 int DataService::sendSensorReadings(SensorReading reading)
 {
-    Configuration config = this->configurationService.getConfiguration();
-    String jsonMessage = this->jsonService.convertSensorReadingsToJson(reading, this->configurationService.getConfiguration());
+    Configuration config = this->configService.getConfiguration();
+    String jsonMessage = this->jsonService.convertSensorReadingsToJson(reading, this->configService.getConfiguration());
 
     return 200;
 }
 
 Configuration DataService::getConfigurationFromServer()
 {
-    Configuration config = this->configurationService.getConfiguration();
+    Configuration config = this->configService.getConfiguration();
 
     return config;
 }
