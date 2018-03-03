@@ -18,7 +18,6 @@ SoilMoistureSensor soilMoistureSensor(soilMoisturePin);
 WaterPump waterPump(&waterPumpPin);
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(PRISM, 16, 6.5, 12);
-// Timer timer;
 
 JsonService jsonService;
 ConfigService configService;
@@ -33,27 +32,23 @@ void updateDevices()
 
   waterPump.updateWateringTime(config.WateringTime);
   soilMoistureSensor.updateTresholdValues(config.SoilMoistureThreshold);
-  // timer.setTimeOffsetInMinutes(config.MeasuringIntervalInMinutes);
 }
 
 void setup()
 {
   Serial.begin(9600);
-  Serial.println("Start");
   Serial.setTimeout(10000);
   pinMode(sensorPowerPin, OUTPUT);
   pinMode(wifiPowerPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
 
-  digitalWrite(wifiPowerPin, HIGH);
-  Serial.println("Wifi powerpin to HIGH");
+  digitalWrite(wifiPowerPin, LOW);
 }
 
 void loop()
 {
-  delay(2000);
-  Serial.println("Loop");
+  digitalWrite(wifiPowerPin, HIGH);
   if (digitalRead(wifiReadyPin) == HIGH)
   {
     Serial.println(SENSOR_ID);
@@ -77,19 +72,18 @@ void loop()
     digitalWrite(sensorPowerPin, LOW);
 
     Serial.println(jsonService.convertSensorReadingsToJson(reading, configService.getConfiguration()));
+    Serial.flush();
 
     while (!Serial.available())
     {
       delay(100);
     }
 
-    Serial.end();
-
+    attachInterrupt(wakeUpPin, wakeUp, FALLING);
     digitalWrite(wifiPowerPin, LOW);
-    attachInterrupt(wakeUpPin, wakeUp, LOW);
-
+    Serial.end();
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
-    Serial.begin(9600);
     detachInterrupt(wakeUpPin);
+    Serial.begin(9600);
   }
 }

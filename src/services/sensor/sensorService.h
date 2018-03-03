@@ -15,7 +15,6 @@ private:
   SoilMoistureSensor soilMoistureSensor;
   WaterTank waterTank;
   TemperatureSensor temperatureSensor;
-  Timer timer;
 
 public:
   SensorService();
