@@ -15,11 +15,11 @@ bool WaterPump::activateWaterPump()
 {
     //Log debug
     digitalWrite(this->waterPumpPin, HIGH);
-    delay(this->wateringTime);
+    delay(this->newWateringTimeInSeconds * 1000);
     digitalWrite(this->waterPumpPin, LOW);
     return true;
 }
 
-void WaterPump::updateWateringTime(int newWateringTime){
-    this->wateringTime = newWateringTime;
+void WaterPump::updateWateringTime(int newWateringTimeInSeconds){
+    this->newWateringTimeInSeconds = newWateringTimeInSeconds;
 }

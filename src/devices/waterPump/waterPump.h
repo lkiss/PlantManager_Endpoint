@@ -5,12 +5,12 @@ class WaterPump
 {
 private:
   int waterPumpPin = 0;
-  int wateringTime = 3000;
+  int newWateringTimeInSeconds = 5;
 
 public:
   WaterPump();
   WaterPump(int *waterPumpPin);
   bool activateWaterPump();
-  void updateWateringTime(int newWateringTime);
+  void updateWateringTime(int newWateringTimeInSeconds);
 };
 #endif

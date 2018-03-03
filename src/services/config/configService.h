@@ -18,7 +18,7 @@ public:
   static ConfigService *getInstance();
 
   String getConfigurationJson();
-  void setConfigurationJson(String config);
+  void setConfigurationJson(String &config);
 
   Configuration getConfiguration();
   void setConfiguration(Configuration config);

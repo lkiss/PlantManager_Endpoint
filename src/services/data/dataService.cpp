@@ -8,8 +8,7 @@ DataService::DataService(ConfigService configService, JsonService jsonService)
 
 int DataService::sendSensorReadings(SensorReading reading)
 {
-    Configuration config = this->configService.getConfiguration();
-    String jsonMessage = this->jsonService.convertSensorReadingsToJson(reading, this->configService.getConfiguration());
+    String jsonMessage = this->jsonService.convertSensorReadingsToJson(reading);
 
     return 200;
 }

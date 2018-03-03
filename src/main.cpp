@@ -1,4 +1,7 @@
+#include <Wire.h>
+#include <RtcDS3231.h>
 #include "LowPower.h"
+
 #include "./devices/devices.h"
 #include "./services/services.h"
 #include "./constants.h"
@@ -18,6 +21,7 @@ SoilMoistureSensor soilMoistureSensor(soilMoisturePin);
 WaterPump waterPump(&waterPumpPin);
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(PRISM, 16, 6.5, 12);
+RtcDS3231<TwoWire> Rtc(Wire);
 
 JsonService jsonService;
 ConfigService configService;
@@ -26,11 +30,50 @@ SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoisture
 
 void wakeUp() {}
 
-void updateDevices()
+void initializeTimer(int measuringIntervalInMinutes)
 {
-  Configuration config = configService.getConfiguration();
+  Rtc.Begin();
 
-  waterPump.updateWateringTime(config.WateringTime);
+  RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
+
+  if (!Rtc.IsDateTimeValid())
+  {
+    Rtc.SetDateTime(compiled);
+  }
+
+  if (!Rtc.GetIsRunning())
+  {
+    Rtc.SetIsRunning(true);
+  }
+
+  RtcDateTime now = Rtc.GetDateTime();
+  if (now < compiled)
+  {
+    Rtc.SetDateTime(compiled);
+  }
+
+  Rtc.Enable32kHzPin(false);
+  Rtc.SetSquareWavePin(DS3231SquareWavePin_ModeAlarmBoth);
+
+  RtcDateTime wakeUpTime = now + (measuringIntervalInMinutes * 60);
+
+  int nowMinute = now.Minute();
+  int futureMinute = wakeUpTime.Minute();
+
+  DS3231AlarmOne wakeTimer(
+      wakeUpTime.Day(),
+      wakeUpTime.Hour(),
+      wakeUpTime.Minute(),
+      wakeUpTime.Second(),
+      DS3231AlarmOneControl_HoursMinutesSecondsMatch);
+  Rtc.SetAlarmOne(wakeTimer);
+  Rtc.LatchAlarmsTriggeredFlags();
+}
+
+void updateDevices(Configuration config)
+{
+
+  waterPump.updateWateringTime(config.WateringTimeInSeconds);
   soilMoistureSensor.updateTresholdValues(config.SoilMoistureThreshold);
 }
 
@@ -52,7 +95,6 @@ void loop()
   if (digitalRead(wifiReadyPin) == HIGH)
   {
     Serial.println(SENSOR_ID);
-    Serial.flush();
 
     while (!Serial.available())
     {
@@ -61,8 +103,9 @@ void loop()
 
     String configString = Serial.readStringUntil('\n');
     configService.setConfigurationJson(configString);
+    Configuration config = configService.getConfiguration();
 
-    updateDevices();
+    updateDevices(config);
 
     digitalWrite(sensorPowerPin, HIGH);
 
@@ -71,8 +114,9 @@ void loop()
 
     digitalWrite(sensorPowerPin, LOW);
 
-    Serial.println(jsonService.convertSensorReadingsToJson(reading, configService.getConfiguration()));
-    Serial.flush();
+    String jsonResult = jsonService.convertSensorReadingsToJson(reading);
+
+    Serial.println(jsonResult);
 
     while (!Serial.available())
     {
@@ -81,9 +125,8 @@ void loop()
 
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
     digitalWrite(wifiPowerPin, LOW);
-    Serial.end();
+    initializeTimer(config.MeasuringIntervalInMinutes);
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
     detachInterrupt(wakeUpPin);
-    Serial.begin(9600);
   }
 }

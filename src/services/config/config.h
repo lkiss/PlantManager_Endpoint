@@ -4,7 +4,7 @@
 struct Configuration
 {
   int SoilMoistureThreshold;
-  int WateringTime;
+  int WateringTimeInSeconds;
   int MeasuringIntervalInMinutes;
 };
 

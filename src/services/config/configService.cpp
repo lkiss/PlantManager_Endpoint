@@ -2,7 +2,7 @@
 
 ConfigService::ConfigService()
 {
-  this->config.WateringTime = 5;
+  this->config.WateringTimeInSeconds = 5;
   this->config.SoilMoistureThreshold = 750;
   this->config.MeasuringIntervalInMinutes = 1;
 }
@@ -19,7 +19,7 @@ String ConfigService::getConfigurationJson()
   return jsonService.convertConfigToJson(this->config);
 }
 
-void ConfigService::setConfigurationJson(String config)
+void ConfigService::setConfigurationJson(String &config)
 {
   this->config = jsonService.convertJsonToConfig(config);
 }

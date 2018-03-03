@@ -1,8 +1,8 @@
 #include "./jsonService.h"
 
-char* JsonService::convertSensorReadingsToJson(SensorReading sensorReading, Configuration configuration)
+String JsonService::convertSensorReadingsToJson(SensorReading sensorReading)
 {
-    char readingBuffer[325];
+    String readingBuffer;
     DynamicJsonBuffer jsonBuffer(325);
 
     JsonObject &reading = jsonBuffer.createObject();
@@ -15,7 +15,7 @@ char* JsonService::convertSensorReadingsToJson(SensorReading sensorReading, Conf
     reading["dht11ErrorCode"] = sensorReading.dht11ErrorCode;
     reading["temperatureUnit"] = sensorReading.temperatureUnit;
 
-    JsonObject& sensor = reading.createNestedObject("sensor");
+    JsonObject &sensor = reading.createNestedObject("sensor");
     sensor["sensorId"] = SENSOR_ID;
 
     reading.printTo(readingBuffer);
@@ -37,15 +37,14 @@ String JsonService::convertConfigToJson(Configuration configuration)
     return jsonMessage;
 }
 
-Configuration JsonService::convertJsonToConfig(String configJson)
+Configuration JsonService::convertJsonToConfig(String &configJson)
 {
     Configuration configuration;
-    String jsonMessage;
-    DynamicJsonBuffer buffer(200);
+    DynamicJsonBuffer buffer(500);
     JsonObject &config = buffer.parseObject(configJson);
     configuration.SoilMoistureThreshold = config["idealSoilMoistureValue"].as<int>();
-    configuration.WateringTime = (config["wateringTimeInSeconds"].as<int>()) * 1000;
-    configuration.MeasuringIntervalInMinutes = (config["measuringIntervalInMinutes"].as<int>()) * 1000 * 60;
+    configuration.WateringTimeInSeconds = config["wateringTimeInSeconds"].as<int>();
+    configuration.MeasuringIntervalInMinutes = config["measuringIntervalInMinutes"].as<int>();
 
     buffer.clear();
 
