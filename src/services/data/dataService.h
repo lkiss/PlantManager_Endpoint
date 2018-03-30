@@ -13,7 +13,6 @@ private:
 
 public:
   DataService(ConfigService configService, JsonService jsonService);
-  int sendSensorReadings(SensorReading reading);
   Configuration getConfigurationFromServer();
 };
 

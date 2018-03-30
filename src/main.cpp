@@ -11,10 +11,15 @@ int waterPumpPin = 6;
 int waterSensorEchoPin = 7;
 int waterSensorTriggerPin = 8;
 int sensorPowerPin = 4;
-int soilMoisturePin = 14;
-int wakeUpPin = INT1;
+int soilMoisturePin = A0;
+int wakeUpPin = INT0;
+int wifiWakeupPin = 10;
 int wifiReadyPin = 9;
-int wifiPowerPin = 10;
+
+bool isWifiPowered = false;
+bool isSensorPowered = false;
+
+int baudRate = 9600;
 
 TemperatureSensor temperatureSensor(&DHT11Pin);
 SoilMoistureSensor soilMoistureSensor(soilMoisturePin);
@@ -30,7 +35,44 @@ SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoisture
 
 void wakeUp() {}
 
-void initializeTimer(int measuringIntervalInMinutes)
+void wakeUpWifi()
+{
+  digitalWrite(wifiWakeupPin, LOW);
+  delay(100);
+  digitalWrite(wifiWakeupPin, HIGH);
+}
+
+void toggleSensors()
+{
+  if (!isSensorPowered)
+  {
+    digitalWrite(sensorPowerPin, HIGH);
+    isSensorPowered = true;
+  }
+  else
+  {
+    digitalWrite(sensorPowerPin, LOW);
+    isSensorPowered = false;
+  }
+}
+
+void updateTimer(int measuringIntervalInMinutes)
+{
+  RtcDateTime now = Rtc.GetDateTime();
+
+  RtcDateTime wakeUpTime = now + (measuringIntervalInMinutes * 60);
+
+  DS3231AlarmOne wakeTimer(
+      wakeUpTime.Day(),
+      wakeUpTime.Hour(),
+      wakeUpTime.Minute(),
+      wakeUpTime.Second(),
+      DS3231AlarmOneControl_HoursMinutesSecondsMatch);
+  Rtc.SetAlarmOne(wakeTimer);
+  Rtc.LatchAlarmsTriggeredFlags();
+}
+
+void initializeTimer()
 {
   Rtc.Begin();
 
@@ -54,20 +96,6 @@ void initializeTimer(int measuringIntervalInMinutes)
 
   Rtc.Enable32kHzPin(false);
   Rtc.SetSquareWavePin(DS3231SquareWavePin_ModeAlarmBoth);
-
-  RtcDateTime wakeUpTime = now + (measuringIntervalInMinutes * 60);
-
-  int nowMinute = now.Minute();
-  int futureMinute = wakeUpTime.Minute();
-
-  DS3231AlarmOne wakeTimer(
-      wakeUpTime.Day(),
-      wakeUpTime.Hour(),
-      wakeUpTime.Minute(),
-      wakeUpTime.Second(),
-      DS3231AlarmOneControl_HoursMinutesSecondsMatch);
-  Rtc.SetAlarmOne(wakeTimer);
-  Rtc.LatchAlarmsTriggeredFlags();
 }
 
 void updateDevices(Configuration config)
@@ -79,54 +107,50 @@ void updateDevices(Configuration config)
 
 void setup()
 {
-  Serial.begin(9600);
-  Serial.setTimeout(10000);
   pinMode(sensorPowerPin, OUTPUT);
-  pinMode(wifiPowerPin, OUTPUT);
+  pinMode(wifiWakeupPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
-
-  digitalWrite(wifiPowerPin, LOW);
+  initializeTimer();
+  wakeUpWifi();
 }
 
 void loop()
 {
-  digitalWrite(wifiPowerPin, HIGH);
   if (digitalRead(wifiReadyPin) == HIGH)
   {
+    Serial.begin(baudRate);
+    Serial.setTimeout(10000);
+
     Serial.println(SENSOR_ID);
 
     while (!Serial.available())
     {
-      delay(100);
     }
 
     String configString = Serial.readStringUntil('\n');
+
     configService.setConfigurationJson(configString);
     Configuration config = configService.getConfiguration();
 
     updateDevices(config);
 
-    digitalWrite(sensorPowerPin, HIGH);
+    toggleSensors();
 
     SensorReading reading = sensorService.getSensorReadings();
     sensorService.water(reading);
 
-    digitalWrite(sensorPowerPin, LOW);
+    toggleSensors();
 
     String jsonResult = jsonService.convertSensorReadingsToJson(reading);
 
     Serial.println(jsonResult);
 
-    while (!Serial.available())
-    {
-      delay(100);
-    }
-
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
-    digitalWrite(wifiPowerPin, LOW);
-    initializeTimer(config.MeasuringIntervalInMinutes);
+    updateTimer(config.MeasuringIntervalInMinutes);
+    Serial.end();
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
     detachInterrupt(wakeUpPin);
+    wakeUpWifi();
   }
 }

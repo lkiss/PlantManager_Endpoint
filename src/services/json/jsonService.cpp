@@ -2,8 +2,9 @@
 
 String JsonService::convertSensorReadingsToJson(SensorReading sensorReading)
 {
+    const size_t bufferSize = JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(8);
     String readingBuffer;
-    DynamicJsonBuffer jsonBuffer(325);
+    DynamicJsonBuffer jsonBuffer(bufferSize);
 
     JsonObject &reading = jsonBuffer.createObject();
 
@@ -39,12 +40,14 @@ String JsonService::convertConfigToJson(Configuration configuration)
 
 Configuration JsonService::convertJsonToConfig(String &configJson)
 {
+    const size_t bufferSize = JSON_OBJECT_SIZE(5) + 150;
+
     Configuration configuration;
-    DynamicJsonBuffer buffer(500);
+    DynamicJsonBuffer buffer(bufferSize);
     JsonObject &config = buffer.parseObject(configJson);
-    configuration.SoilMoistureThreshold = config["idealSoilMoistureValue"].as<int>();
-    configuration.WateringTimeInSeconds = config["wateringTimeInSeconds"].as<int>();
-    configuration.MeasuringIntervalInMinutes = config["measuringIntervalInMinutes"].as<int>();
+    configuration.SoilMoistureThreshold = config["idealSoilMoistureValue"];
+    configuration.WateringTimeInSeconds = config["wateringTimeInSeconds"];
+    configuration.MeasuringIntervalInMinutes = config["measuringIntervalInMinutes"];
 
     buffer.clear();
 

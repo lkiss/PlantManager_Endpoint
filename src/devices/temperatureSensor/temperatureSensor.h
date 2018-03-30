@@ -1,6 +1,7 @@
 #ifndef DHT11_SENSOR
 #define DHT11_SENSOR
 
+#include "DHT.h"
 #include "./temperatureSensorReading.h"
 
 class TemperatureSensor
