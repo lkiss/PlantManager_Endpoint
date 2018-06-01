@@ -15,6 +15,7 @@ private:
   SoilMoistureSensor soilMoistureSensor;
   WaterTank waterTank;
   TemperatureSensor temperatureSensor;
+  BatteryMeter batterMeter;
 
 public:
   SensorService();
@@ -24,8 +25,9 @@ public:
       const WaterPump &waterPump,
       const SoilMoistureSensor &soilMoistureSensor,
       const TemperatureSensor &temperatureSensor);
-  SensorReading getSensorReadings();
+  SensorReading getSensorReadings(float batteryVoltage);
   bool water(SensorReading reading);
+  void updateSensorsParamaters(Configuration config);
 };
 
 #endif

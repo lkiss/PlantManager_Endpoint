@@ -18,10 +18,17 @@ TemperatureSensorReading TemperatureSensor::read()
   dht.setup(this->temperatureSensorPin);
 
   delay(3000);
-  
+
+  reading.temperatureInCelsius = 0;
+  reading.humidity = 0;
   reading.dht11ErrorCode = 0;
-  reading.temperatureInCelsius = (int)dht.getTemperature();
-  reading.humidity = (int)dht.getHumidity();
+
+  while (reading.temperatureInCelsius == 0 && reading.humidity == 0)
+  {
+    reading.temperatureInCelsius = (int)dht.getTemperature();
+    reading.humidity = (int)dht.getHumidity();
+    delay(20);
+  }
 
   return reading;
 }

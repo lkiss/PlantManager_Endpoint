@@ -11,6 +11,6 @@ public:
   WaterPump();
   WaterPump(int *waterPumpPin);
   bool activateWaterPump();
-  void updateWateringTime(int newWateringTimeInSeconds);
+  void updateWateringTime(int &newWateringTimeInSeconds);
 };
 #endif

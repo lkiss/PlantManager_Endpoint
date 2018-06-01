@@ -47,10 +47,12 @@ int SoilMoistureSensor::read()
   return result;
 }
 
-void SoilMoistureSensor::updateTresholdValues(int newTreshold)
+void SoilMoistureSensor::updateTresholdValues(int &newTreshold)
 {
   if (this->isValidMoistureTreshold(newTreshold) && this->isValidMoistureTreshold(newTreshold))
   {
     this->soilMoistureWetTreshold = newTreshold;
+    // Serial.print("Soil moisture value: ");
+    // Serial.println(this->soilMoistureWetTreshold);
   }
 }

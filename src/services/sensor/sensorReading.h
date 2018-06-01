@@ -7,9 +7,9 @@ struct SensorReading
 {
     int temperature;
     int humidity;
-    String dht11ErrorCode;
     int soilMoisture;
     int waterLevel;
+    float batteryVoltage;
     const char* temperatureUnit;
     const char* waterLevelUnit;
 };

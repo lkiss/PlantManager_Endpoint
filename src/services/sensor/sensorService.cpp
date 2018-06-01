@@ -2,7 +2,7 @@
 
 SensorService::SensorService() {}
 
-SensorReading SensorService::getSensorReadings()
+SensorReading SensorService::getSensorReadings(float batteryVoltage)
 {
     SensorReading reading;
     TemperatureSensorReading temperatureSensorReading;
@@ -15,7 +15,7 @@ SensorReading SensorService::getSensorReadings()
     reading.humidity = temperatureSensorReading.humidity;
     reading.temperature = temperatureSensorReading.temperatureInCelsius;
     reading.temperatureUnit = "C";
-    reading.dht11ErrorCode = temperatureSensorReading.dht11ErrorCode;
+    reading.batteryVoltage = batteryVoltage;
 
     return reading;
 }
@@ -32,6 +32,12 @@ SensorService::SensorService(
     this->soilMoistureSensor = soilMoistureSensor;
     this->temperatureSensor = temperatureSensor;
     this->waterTank = waterTank;
+}
+
+void SensorService::updateSensorsParamaters(Configuration config)
+{
+    this->waterPump.updateWateringTime(config.WateringTimeInSeconds);
+    this->soilMoistureSensor.updateTresholdValues(config.SoilMoistureThreshold);
 }
 
 bool SensorService::water(SensorReading reading)

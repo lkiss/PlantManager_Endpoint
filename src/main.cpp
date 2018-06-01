@@ -12,9 +12,13 @@ int waterSensorEchoPin = 7;
 int waterSensorTriggerPin = 8;
 int sensorPowerPin = 4;
 int soilMoisturePin = A0;
+int bateryMeterPin = A1;
 int wakeUpPin = INT0;
 int wifiWakeupPin = 10;
 int wifiReadyPin = 9;
+int solarPanelConnectionPin = 11;
+
+float batteryVoltage = 0;
 
 bool isWifiPowered = false;
 bool isSensorPowered = false;
@@ -27,6 +31,7 @@ WaterPump waterPump(&waterPumpPin);
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(PRISM, 16, 6.5, 12);
 RtcDS3231<TwoWire> Rtc(Wire);
+BatteryMeter batteryMeter(bateryMeterPin);
 
 JsonService jsonService;
 ConfigService configService;
@@ -98,19 +103,16 @@ void initializeTimer()
   Rtc.SetSquareWavePin(DS3231SquareWavePin_ModeAlarmBoth);
 }
 
-void updateDevices(Configuration config)
-{
-
-  waterPump.updateWateringTime(config.WateringTimeInSeconds);
-  soilMoistureSensor.updateTresholdValues(config.SoilMoistureThreshold);
-}
-
 void setup()
 {
   pinMode(sensorPowerPin, OUTPUT);
   pinMode(wifiWakeupPin, OUTPUT);
+  pinMode(solarPanelConnectionPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
+
+  batteryVoltage = batteryMeter.getBatteryVoltage();
+
   initializeTimer();
   wakeUpWifi();
 }
@@ -133,24 +135,31 @@ void loop()
     configService.setConfigurationJson(configString);
     Configuration config = configService.getConfiguration();
 
-    updateDevices(config);
+    sensorService.updateSensorsParamaters(config);
 
     toggleSensors();
+    SensorReading reading = sensorService.getSensorReadings(batteryVoltage);
+    toggleSensors();
 
-    SensorReading reading = sensorService.getSensorReadings();
     sensorService.water(reading);
 
-    toggleSensors();
-
     String jsonResult = jsonService.convertSensorReadingsToJson(reading);
-
     Serial.println(jsonResult);
 
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
     updateTimer(config.MeasuringIntervalInMinutes);
+    // Serial.print("MeasuringIntervalInMinutes: ");
+    // Serial.println(config.MeasuringIntervalInMinutes);
+    // Serial.print("SoilMoistureThreshold: ");
+    // Serial.println(config.SoilMoistureThreshold);
+    // Serial.print("WateringTimeInSeconds: ");
+    // Serial.println(config.WateringTimeInSeconds);
     Serial.end();
+
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
     detachInterrupt(wakeUpPin);
+
+    batteryVoltage = batteryMeter.getBatteryVoltage();
     wakeUpWifi();
   }
 }

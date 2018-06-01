@@ -3,7 +3,7 @@
 #endif
 
 #ifndef SENSOR_ID
-#define SENSOR_ID "72fb5192-a399-4e74-96e1-1a40cf7f934d"
+#define SENSOR_ID "a8997fcd-328e-43f7-98b0-4c75390f89c6"
 #endif
 
 #ifndef SENSOR_TYPE
