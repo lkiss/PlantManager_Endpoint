@@ -6,15 +6,16 @@ class WaterTank
 private:
   double waterTankVolumeCC;
   double minimumWaterThresholdPercentage = 20;
-  WaterTankType waterTankType;
+  int waterTankType;
   DimensionsInCentimeters dimensions;
   void CalculateCapacityCC();
   double CalculateVolume(double height);
 
 public:
   WaterTank();
-  WaterTank(WaterTankType tankType, DimensionsInCentimeters dimensions);
-  WaterTank(WaterTankType tankType, double lengthCM = 0, double widthCM = 0, double heightCM = 0, double radiusCM = 0);
+  WaterTank(int tankType, DimensionsInCentimeters dimensions);
+  WaterTank(int tankType, double lengthCM = 0, double widthCM = 0, double heightCM = 0, double radiusCM = 0);
+  void updateWaterTankParameters(int tankType, double lengthCM, double widthCM, double heightCM, double radiusCM, double minimumWaterThresholdPercentage);
   bool isWaterLevelSufficient(double height);
   double GetRemainingInPercentage(double height);
 };

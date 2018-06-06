@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include "config.h"
-#include "constants.h"
 #include "../json/jsonService.h"
 
 class ConfigService

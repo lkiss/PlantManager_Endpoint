@@ -6,6 +6,9 @@
 #include "./services/services.h"
 #include "./constants.h"
 
+int errorLedPin = LED_BUILTIN;
+int numberOfWifiRestAttempts = 0;
+int maximumNumberOfWifiRestAttempts = 5;
 int DHT11Pin = 5;
 int waterPumpPin = 6;
 int waterSensorEchoPin = 7;
@@ -36,7 +39,7 @@ BatteryMeter batteryMeter(bateryMeterPin);
 JsonService jsonService;
 ConfigService configService;
 DataService dataService(configService, jsonService);
-SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoistureSensor, temperatureSensor);
+SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoistureSensor, temperatureSensor, configService);
 
 void wakeUp() {}
 
@@ -105,6 +108,7 @@ void initializeTimer()
 
 void setup()
 {
+  pinMode(errorLedPin, OUTPUT);
   pinMode(sensorPowerPin, OUTPUT);
   pinMode(wifiWakeupPin, OUTPUT);
   pinMode(solarPanelConnectionPin, OUTPUT);
@@ -141,10 +145,10 @@ void loop()
     SensorReading reading = sensorService.getSensorReadings(batteryVoltage);
     toggleSensors();
 
-    sensorService.water(reading);
-
     String jsonResult = jsonService.convertSensorReadingsToJson(reading);
     Serial.println(jsonResult);
+
+    sensorService.water(reading);
 
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
     updateTimer(config.MeasuringIntervalInMinutes);
@@ -155,11 +159,30 @@ void loop()
     // Serial.print("WateringTimeInSeconds: ");
     // Serial.println(config.WateringTimeInSeconds);
     Serial.end();
+    numberOfWifiRestAttempts = 0;
 
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
     detachInterrupt(wakeUpPin);
 
     batteryVoltage = batteryMeter.getBatteryVoltage();
     wakeUpWifi();
+  }
+  else
+  {
+    if (numberOfWifiRestAttempts == maximumNumberOfWifiRestAttempts)
+    {
+      for (int i = 0; i < 10; i++)
+      {
+        digitalWrite(errorLedPin, HIGH);
+        delay(1000);
+        digitalWrite(errorLedPin, LOW);
+        delay(1000);
+      }
+      digitalWrite(errorLedPin, HIGH);
+      LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+    }
+    numberOfWifiRestAttempts++;
+    wakeUpWifi();
+    delay(3000);
   }
 }

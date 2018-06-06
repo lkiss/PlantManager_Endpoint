@@ -48,6 +48,12 @@ Configuration JsonService::convertJsonToConfig(String &configJson)
     configuration.SoilMoistureThreshold = config["idealSoilMoistureValue"];
     configuration.WateringTimeInSeconds = config["wateringTimeInSeconds"];
     configuration.MeasuringIntervalInMinutes = config["measuringIntervalInMinutes"];
+    configuration.WaterTankLength = config["waterTankLength"];
+    configuration.WaterTankWidth = config["waterTankWidth"];
+    configuration.WaterTankHeight = config["waterTankHeight"];
+    configuration.WaterTankRadius = config["waterTankRadius"];
+    configuration.TankType = config["waterTankType"];
+    configuration.minimumWaterThresholdPercentage = config["minimumWaterThresholdPercentage"];
 
     buffer.clear();
 

@@ -25,13 +25,15 @@ SensorService::SensorService(
     const WaterLevelSensor &waterLevelSensor,
     const WaterPump &waterPump,
     const SoilMoistureSensor &soilMoistureSensor,
-    const TemperatureSensor &temperatureSensor)
+    const TemperatureSensor &temperatureSensor,
+    const ConfigService &configService)
 {
+    this->waterTank = waterTank;
     this->waterLevelSensor = waterLevelSensor;
     this->waterPump = waterPump;
     this->soilMoistureSensor = soilMoistureSensor;
     this->temperatureSensor = temperatureSensor;
-    this->waterTank = waterTank;
+    this->configService = configService;
 }
 
 void SensorService::updateSensorsParamaters(Configuration config)
@@ -42,6 +44,10 @@ void SensorService::updateSensorsParamaters(Configuration config)
 
 bool SensorService::water(SensorReading reading)
 {
+    const Configuration config = this->configService.getConfiguration();
+    this->waterTank.updateWaterTankParameters(
+        config.TankType, config.WaterTankLength, config.WaterTankWidth, config.WaterTankHeight, config.WaterTankRadius, config.WaterTankHeight);
+        
     if (this->waterTank.isWaterLevelSufficient(reading.waterLevel))
     {
         if (this->soilMoistureSensor.isDry(reading.soilMoisture))

@@ -3,7 +3,7 @@
 
 WaterTank::WaterTank() {}
 
-WaterTank::WaterTank(WaterTankType tankType, DimensionsInCentimeters dimensions)
+WaterTank::WaterTank(int tankType, DimensionsInCentimeters dimensions)
 {
     this->waterTankType = tankType;
     this->dimensions = dimensions;
@@ -11,7 +11,7 @@ WaterTank::WaterTank(WaterTankType tankType, DimensionsInCentimeters dimensions)
     CalculateCapacityCC();
 }
 
-WaterTank::WaterTank(WaterTankType tankType, double lengthCM, double widthCM, double heightCM, double radiusCM)
+WaterTank::WaterTank(int tankType, double lengthCM, double widthCM, double heightCM, double radiusCM)
 {
     DimensionsInCentimeters dimensions;
     dimensions.length = lengthCM;
@@ -25,25 +25,40 @@ WaterTank::WaterTank(WaterTankType tankType, double lengthCM, double widthCM, do
     CalculateCapacityCC();
 }
 
+void WaterTank::updateWaterTankParameters(int tankType, double lengthCM, double widthCM, double heightCM, double radiusCM, double minimumWaterThresholdPercentage)
+{
+    DimensionsInCentimeters dimensions;
+    dimensions.length = lengthCM;
+    dimensions.width = widthCM;
+    dimensions.height = heightCM;
+    dimensions.radius = radiusCM;
+
+    this->minimumWaterThresholdPercentage = minimumWaterThresholdPercentage;
+    this->waterTankType = tankType;
+    this->dimensions = dimensions;
+
+    CalculateCapacityCC();
+}
+
 double WaterTank::CalculateVolume(double height)
 {
     double volume = 0;
 
     switch (this->waterTankType)
     {
-    case WaterTankType::CYLINDER:
+    case 1: //CYLINDER
     {
         volume = pow(this->dimensions.radius, 2) * PI * height;
         break;
     }
 
-    case WaterTankType::CUBE:
+    case 2: //CUBE
     {
         volume = pow(this->dimensions.width, 2) * height;
         break;
     }
 
-    case WaterTankType::PRISM:
+    case 3: //PRISM
     {
         volume = this->dimensions.width * this->dimensions.length * height;
         break;
