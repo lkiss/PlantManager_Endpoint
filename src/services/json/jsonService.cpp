@@ -40,7 +40,7 @@ String JsonService::convertConfigToJson(Configuration configuration)
 
 Configuration JsonService::convertJsonToConfig(String &configJson)
 {
-    const size_t bufferSize = JSON_OBJECT_SIZE(5) + 150;
+    const size_t bufferSize = JSON_OBJECT_SIZE(4) + 140;
 
     Configuration configuration;
     DynamicJsonBuffer buffer(bufferSize);
@@ -48,12 +48,7 @@ Configuration JsonService::convertJsonToConfig(String &configJson)
     configuration.SoilMoistureThreshold = config["idealSoilMoistureValue"];
     configuration.WateringTimeInSeconds = config["wateringTimeInSeconds"];
     configuration.MeasuringIntervalInMinutes = config["measuringIntervalInMinutes"];
-    configuration.WaterTankLength = config["waterTankLength"];
-    configuration.WaterTankWidth = config["waterTankWidth"];
-    configuration.WaterTankHeight = config["waterTankHeight"];
-    configuration.WaterTankRadius = config["waterTankRadius"];
-    configuration.TankType = config["waterTankType"];
-    configuration.minimumWaterThresholdPercentage = config["minimumWaterThresholdPercentage"];
+    configuration.MinimumWaterThresholdPercentage = config["minimumWaterThresholdPercentage"];
 
     buffer.clear();
 

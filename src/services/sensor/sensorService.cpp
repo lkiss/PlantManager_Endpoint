@@ -25,8 +25,7 @@ SensorService::SensorService(
     const WaterLevelSensor &waterLevelSensor,
     const WaterPump &waterPump,
     const SoilMoistureSensor &soilMoistureSensor,
-    const TemperatureSensor &temperatureSensor,
-    const ConfigService &configService)
+    const TemperatureSensor &temperatureSensor)
 {
     this->waterTank = waterTank;
     this->waterLevelSensor = waterLevelSensor;
@@ -40,14 +39,30 @@ void SensorService::updateSensorsParamaters(Configuration config)
 {
     this->waterPump.updateWateringTime(config.WateringTimeInSeconds);
     this->soilMoistureSensor.updateTresholdValues(config.SoilMoistureThreshold);
+    this->waterTank.updateWaterTresholdValue(config.MinimumWaterThresholdPercentage);
+
+    // Serial.print("WateringTimeInSeconds: ");
+    // Serial.println(config.WateringTimeInSeconds);
+
+    // Serial.print("SoilMoistureThreshold: ");
+    // Serial.println(config.SoilMoistureThreshold);
+
+    // Serial.print("TankType: ");
+    // Serial.println(config.TankType);
+    // Serial.print("WaterTankLength: ");
+    // Serial.println(config.WaterTankLength);
+    // Serial.print("WaterTankWidth: ");
+    // Serial.println(config.WaterTankWidth);
+    // Serial.print("WaterTankHeight: ");
+    // Serial.println(config.WaterTankHeight);
+    // Serial.print("WaterTankRadius: ");
+    // Serial.println(config.WaterTankRadius);
+    // Serial.print("minimumWaterThresholdPercentage: ");
+    // Serial.println(config.MinimumWaterThresholdPercentage);
 }
 
 bool SensorService::water(SensorReading reading)
 {
-    const Configuration config = this->configService.getConfiguration();
-    this->waterTank.updateWaterTankParameters(
-        config.TankType, config.WaterTankLength, config.WaterTankWidth, config.WaterTankHeight, config.WaterTankRadius, config.WaterTankHeight);
-        
     if (this->waterTank.isWaterLevelSufficient(reading.waterLevel))
     {
         if (this->soilMoistureSensor.isDry(reading.soilMoisture))

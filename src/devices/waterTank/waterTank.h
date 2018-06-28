@@ -15,7 +15,7 @@ public:
   WaterTank();
   WaterTank(int tankType, DimensionsInCentimeters dimensions);
   WaterTank(int tankType, double lengthCM = 0, double widthCM = 0, double heightCM = 0, double radiusCM = 0);
-  void updateWaterTankParameters(int tankType, double lengthCM, double widthCM, double heightCM, double radiusCM, double minimumWaterThresholdPercentage);
+  void updateWaterTresholdValue(double minimumWaterThresholdPercentage);
   bool isWaterLevelSufficient(double height);
   double GetRemainingInPercentage(double height);
 };

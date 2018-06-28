@@ -25,19 +25,9 @@ WaterTank::WaterTank(int tankType, double lengthCM, double widthCM, double heigh
     CalculateCapacityCC();
 }
 
-void WaterTank::updateWaterTankParameters(int tankType, double lengthCM, double widthCM, double heightCM, double radiusCM, double minimumWaterThresholdPercentage)
+void WaterTank::updateWaterTresholdValue(double minimumWaterThresholdPercentage)
 {
-    DimensionsInCentimeters dimensions;
-    dimensions.length = lengthCM;
-    dimensions.width = widthCM;
-    dimensions.height = heightCM;
-    dimensions.radius = radiusCM;
-
     this->minimumWaterThresholdPercentage = minimumWaterThresholdPercentage;
-    this->waterTankType = tankType;
-    this->dimensions = dimensions;
-
-    CalculateCapacityCC();
 }
 
 double WaterTank::CalculateVolume(double height)
@@ -46,19 +36,19 @@ double WaterTank::CalculateVolume(double height)
 
     switch (this->waterTankType)
     {
-    case 1: //CYLINDER
+    case CYLINDER: //CYLINDER
     {
         volume = pow(this->dimensions.radius, 2) * PI * height;
         break;
     }
 
-    case 2: //CUBE
+    case CUBE: //CUBE
     {
         volume = pow(this->dimensions.width, 2) * height;
         break;
     }
 
-    case 3: //PRISM
+    case PRISM: //PRISM
     {
         volume = this->dimensions.width * this->dimensions.length * height;
         break;

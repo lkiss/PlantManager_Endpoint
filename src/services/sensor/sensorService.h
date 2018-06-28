@@ -24,8 +24,7 @@ public:
       const WaterLevelSensor &waterLevelSensor,
       const WaterPump &waterPump,
       const SoilMoistureSensor &soilMoistureSensor,
-      const TemperatureSensor &temperatureSensor,
-      const ConfigService &configService);
+      const TemperatureSensor &temperatureSensor);
   SensorReading getSensorReadings(float batteryVoltage);
   bool water(SensorReading reading);
   void updateSensorsParamaters(Configuration config);

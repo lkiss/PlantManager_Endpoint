@@ -10,8 +10,10 @@ struct Configuration
   double WaterTankWidth;
   double WaterTankHeight;
   double WaterTankRadius;
-  double minimumWaterThresholdPercentage;
+  double MinimumWaterThresholdPercentage;
   int TankType;
+  int MaximumNumberOfWifiRestAttempts;
+  boolean ShouldUseCloud;
 };
 
 #endif

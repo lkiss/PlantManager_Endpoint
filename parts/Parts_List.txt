@@ -1,0 +1,23 @@
+PlantManager Hardware parts
+- Arduino pro mini 8MHz 3.3v
+- ESP-12E wifi module
+- DS3231 timer
+- HC-SR04P ultrasonic distance meter
+- Soil Moisture sensor
+- DHT 11 temperature sensor
+- TP4056 Lithium Batter Charger
+- Small water pump 3V-5V
+- 3.7V Lipo battery
+- 5V 0.72W Solar panel
+- Plastic box
+- ESP-12E case
+
+- Resistance 4.7 KOhm * 10
+- Resistance 10 KOhm * 1
+- Resistance 30 KOhm * 1
+- Diode 1N4001 * 1
+- Capacitor Electrolit 470 uF * 1
+- Capacitor Ceramic 100 nF
+- 7333a Voltage Regulator
+- FQP30N06 Logic level MOSTFET
+

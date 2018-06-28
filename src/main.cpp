@@ -8,7 +8,6 @@
 
 int errorLedPin = LED_BUILTIN;
 int numberOfWifiRestAttempts = 0;
-int maximumNumberOfWifiRestAttempts = 5;
 int DHT11Pin = 5;
 int waterPumpPin = 6;
 int waterSensorEchoPin = 7;
@@ -39,7 +38,7 @@ BatteryMeter batteryMeter(bateryMeterPin);
 JsonService jsonService;
 ConfigService configService;
 DataService dataService(configService, jsonService);
-SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoistureSensor, temperatureSensor, configService);
+SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoistureSensor, temperatureSensor);
 
 void wakeUp() {}
 
@@ -119,6 +118,7 @@ void setup()
 
   initializeTimer();
   wakeUpWifi();
+  delay(3000);
 }
 
 void loop()
@@ -145,8 +145,12 @@ void loop()
     SensorReading reading = sensorService.getSensorReadings(batteryVoltage);
     toggleSensors();
 
-    String jsonResult = jsonService.convertSensorReadingsToJson(reading);
-    Serial.println(jsonResult);
+    if (config.ShouldUseCloud)
+    {
+      String jsonResult = jsonService.convertSensorReadingsToJson(reading);
+      Serial.println(jsonResult);
+      Serial.flush();
+    }
 
     sensorService.water(reading);
 
@@ -158,6 +162,8 @@ void loop()
     // Serial.println(config.SoilMoistureThreshold);
     // Serial.print("WateringTimeInSeconds: ");
     // Serial.println(config.WateringTimeInSeconds);
+    // Serial.print("minimumWaterThresholdPercentage: ");
+    // Serial.println(config.MinimumWaterThresholdPercentage);
     Serial.end();
     numberOfWifiRestAttempts = 0;
 
@@ -166,10 +172,11 @@ void loop()
 
     batteryVoltage = batteryMeter.getBatteryVoltage();
     wakeUpWifi();
+    delay(3000);
   }
   else
   {
-    if (numberOfWifiRestAttempts == maximumNumberOfWifiRestAttempts)
+    if (numberOfWifiRestAttempts == configService.getConfiguration().MaximumNumberOfWifiRestAttempts)
     {
       for (int i = 0; i < 10; i++)
       {
@@ -183,6 +190,6 @@ void loop()
     }
     numberOfWifiRestAttempts++;
     wakeUpWifi();
-    delay(3000);
+    delay(5000);
   }
 }
