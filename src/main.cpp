@@ -8,17 +8,16 @@
 
 int errorLedPin = LED_BUILTIN;
 int numberOfWifiRestAttempts = 0;
-int DHT11Pin = 5;
-int waterPumpPin = 6;
-int waterSensorEchoPin = 7;
-int waterSensorTriggerPin = 8;
-int sensorPowerPin = 4;
+int DHT11Pin = 11;
+int waterPumpPin = 9;
+int waterSensorEchoPin = 12;
+int waterSensorTriggerPin = 13;
+int sensorPowerPin = 10;
 int soilMoisturePin = A0;
 int bateryMeterPin = A1;
 int wakeUpPin = INT0;
-int wifiWakeupPin = 10;
-int wifiReadyPin = 9;
-int solarPanelConnectionPin = 11;
+int wifiWakeupPin = 4;
+int wifiReadyPin = 3;
 
 float batteryVoltage = 0;
 
@@ -110,7 +109,6 @@ void setup()
   pinMode(errorLedPin, OUTPUT);
   pinMode(sensorPowerPin, OUTPUT);
   pinMode(wifiWakeupPin, OUTPUT);
-  pinMode(solarPanelConnectionPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
 
@@ -145,12 +143,9 @@ void loop()
     SensorReading reading = sensorService.getSensorReadings(batteryVoltage);
     toggleSensors();
 
-    if (config.ShouldUseCloud)
-    {
-      String jsonResult = jsonService.convertSensorReadingsToJson(reading);
-      Serial.println(jsonResult);
-      Serial.flush();
-    }
+    String jsonResult = jsonService.convertSensorReadingsToJson(reading);
+    Serial.println(jsonResult);
+    Serial.flush();
 
     sensorService.water(reading);
 

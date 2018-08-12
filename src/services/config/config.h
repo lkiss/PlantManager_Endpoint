@@ -13,7 +13,6 @@ struct Configuration
   double MinimumWaterThresholdPercentage;
   int TankType;
   int MaximumNumberOfWifiRestAttempts;
-  boolean ShouldUseCloud;
 };
 
 #endif

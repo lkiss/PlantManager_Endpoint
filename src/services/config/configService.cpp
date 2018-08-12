@@ -6,7 +6,6 @@ ConfigService::ConfigService()
   this->config.SoilMoistureThreshold = 750;
   this->config.MeasuringIntervalInMinutes = 1;
   this->config.MaximumNumberOfWifiRestAttempts = 5;
-  this->config.ShouldUseCloud = true;
 }
 
 ConfigService *ConfigService::getInstance()
