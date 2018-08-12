@@ -14,7 +14,6 @@ String JsonService::convertSensorReadingsToJson(SensorReading sensorReading)
     reading["humidity"] = sensorReading.humidity;
     reading["temperature"] = sensorReading.temperature;
     reading["temperatureUnit"] = sensorReading.temperatureUnit;
-    reading["batteryVoltage"] = sensorReading.batteryVoltage;
 
     JsonObject &sensor = reading.createNestedObject("sensor");
     sensor["sensorId"] = SENSOR_ID;

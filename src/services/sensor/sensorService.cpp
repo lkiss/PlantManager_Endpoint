@@ -2,7 +2,7 @@
 
 SensorService::SensorService() {}
 
-SensorReading SensorService::getSensorReadings(float batteryVoltage)
+SensorReading SensorService::getSensorReadings()
 {
     SensorReading reading;
     TemperatureSensorReading temperatureSensorReading;
@@ -15,7 +15,6 @@ SensorReading SensorService::getSensorReadings(float batteryVoltage)
     reading.humidity = temperatureSensorReading.humidity;
     reading.temperature = temperatureSensorReading.temperatureInCelsius;
     reading.temperatureUnit = "C";
-    reading.batteryVoltage = batteryVoltage;
 
     return reading;
 }

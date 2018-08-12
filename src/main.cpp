@@ -14,12 +14,9 @@ int waterSensorEchoPin = 12;
 int waterSensorTriggerPin = 13;
 int sensorPowerPin = 10;
 int soilMoisturePin = A0;
-int bateryMeterPin = A1;
 int wakeUpPin = INT0;
 int wifiWakeupPin = 4;
 int wifiReadyPin = 3;
-
-float batteryVoltage = 0;
 
 bool isWifiPowered = false;
 bool isSensorPowered = false;
@@ -31,8 +28,7 @@ SoilMoistureSensor soilMoistureSensor(soilMoisturePin);
 WaterPump waterPump(&waterPumpPin);
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(PRISM, 16, 6.5, 12);
-RtcDS3231<TwoWire> Rtc(Wire);
-BatteryMeter batteryMeter(bateryMeterPin);
+RealTimeClock realTimeClock;
 
 JsonService jsonService;
 ConfigService configService;
@@ -62,48 +58,6 @@ void toggleSensors()
   }
 }
 
-void updateTimer(int measuringIntervalInMinutes)
-{
-  RtcDateTime now = Rtc.GetDateTime();
-
-  RtcDateTime wakeUpTime = now + (measuringIntervalInMinutes * 60);
-
-  DS3231AlarmOne wakeTimer(
-      wakeUpTime.Day(),
-      wakeUpTime.Hour(),
-      wakeUpTime.Minute(),
-      wakeUpTime.Second(),
-      DS3231AlarmOneControl_HoursMinutesSecondsMatch);
-  Rtc.SetAlarmOne(wakeTimer);
-  Rtc.LatchAlarmsTriggeredFlags();
-}
-
-void initializeTimer()
-{
-  Rtc.Begin();
-
-  RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-
-  if (!Rtc.IsDateTimeValid())
-  {
-    Rtc.SetDateTime(compiled);
-  }
-
-  if (!Rtc.GetIsRunning())
-  {
-    Rtc.SetIsRunning(true);
-  }
-
-  RtcDateTime now = Rtc.GetDateTime();
-  if (now < compiled)
-  {
-    Rtc.SetDateTime(compiled);
-  }
-
-  Rtc.Enable32kHzPin(false);
-  Rtc.SetSquareWavePin(DS3231SquareWavePin_ModeAlarmBoth);
-}
-
 void setup()
 {
   pinMode(errorLedPin, OUTPUT);
@@ -112,9 +66,7 @@ void setup()
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
 
-  batteryVoltage = batteryMeter.getBatteryVoltage();
-
-  initializeTimer();
+  realTimeClock.InitializeRtc();
   wakeUpWifi();
   delay(3000);
 }
@@ -140,7 +92,7 @@ void loop()
     sensorService.updateSensorsParamaters(config);
 
     toggleSensors();
-    SensorReading reading = sensorService.getSensorReadings(batteryVoltage);
+    SensorReading reading = sensorService.getSensorReadings();
     toggleSensors();
 
     String jsonResult = jsonService.convertSensorReadingsToJson(reading);
@@ -150,7 +102,7 @@ void loop()
     sensorService.water(reading);
 
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
-    updateTimer(config.MeasuringIntervalInMinutes);
+    realTimeClock.UpdateTimer(config.MeasuringIntervalInMinutes);
     // Serial.print("MeasuringIntervalInMinutes: ");
     // Serial.println(config.MeasuringIntervalInMinutes);
     // Serial.print("SoilMoistureThreshold: ");
@@ -165,7 +117,6 @@ void loop()
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
     detachInterrupt(wakeUpPin);
 
-    batteryVoltage = batteryMeter.getBatteryVoltage();
     wakeUpWifi();
     delay(3000);
   }
