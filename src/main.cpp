@@ -1,5 +1,5 @@
-#include <Wire.h>
 #include <RtcDS3231.h>
+#include <Wire.h>
 #include "LowPower.h"
 
 #include "./devices/devices.h"
@@ -23,12 +23,12 @@ bool isSensorPowered = false;
 
 int baudRate = 9600;
 
+RtcDS3231<TwoWire> Rtc(Wire);
 TemperatureSensor temperatureSensor(&DHT11Pin);
 SoilMoistureSensor soilMoistureSensor(soilMoisturePin);
 WaterPump waterPump(&waterPumpPin);
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(PRISM, 16, 6.5, 12);
-RealTimeClock realTimeClock;
 
 JsonService jsonService;
 ConfigService configService;
@@ -58,6 +58,46 @@ void toggleSensors()
   }
 }
 
+void updateTimer(int measuringIntervalInMinutes)
+{
+  RtcDateTime now = Rtc.GetDateTime();
+
+  RtcDateTime wakeUpTime = now + (measuringIntervalInMinutes * 60);
+
+  DS3231AlarmOne wakeTimer(
+      wakeUpTime.Day(),
+      wakeUpTime.Hour(),
+      wakeUpTime.Minute(),
+      wakeUpTime.Second(),
+      DS3231AlarmOneControl_HoursMinutesSecondsMatch);
+  Rtc.SetAlarmOne(wakeTimer);
+  Rtc.LatchAlarmsTriggeredFlags();
+}
+
+void initializeRtc()
+{
+  RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
+
+  if (!Rtc.IsDateTimeValid())
+  {
+    Rtc.SetDateTime(compiled);
+  }
+
+  if (!Rtc.GetIsRunning())
+  {
+    Rtc.SetIsRunning(true);
+  }
+
+  RtcDateTime now = Rtc.GetDateTime();
+  if (now < compiled)
+  {
+    Rtc.SetDateTime(compiled);
+  }
+
+  Rtc.Enable32kHzPin(false);
+  Rtc.SetSquareWavePin(DS3231SquareWavePin_ModeAlarmBoth);
+}
+
 void setup()
 {
   pinMode(errorLedPin, OUTPUT);
@@ -65,9 +105,9 @@ void setup()
   pinMode(wifiWakeupPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
-
-  realTimeClock.InitializeRtc();
+  initializeRtc();  
   wakeUpWifi();
+
   delay(3000);
 }
 
@@ -102,7 +142,8 @@ void loop()
     sensorService.water(reading);
 
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
-    realTimeClock.UpdateTimer(config.MeasuringIntervalInMinutes);
+    updateTimer(config.MeasuringIntervalInMinutes);
+
     // Serial.print("MeasuringIntervalInMinutes: ");
     // Serial.println(config.MeasuringIntervalInMinutes);
     // Serial.print("SoilMoistureThreshold: ");
@@ -112,30 +153,11 @@ void loop()
     // Serial.print("minimumWaterThresholdPercentage: ");
     // Serial.println(config.MinimumWaterThresholdPercentage);
     Serial.end();
-    numberOfWifiRestAttempts = 0;
 
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
     detachInterrupt(wakeUpPin);
 
     wakeUpWifi();
     delay(3000);
-  }
-  else
-  {
-    if (numberOfWifiRestAttempts == configService.getConfiguration().MaximumNumberOfWifiRestAttempts)
-    {
-      for (int i = 0; i < 10; i++)
-      {
-        digitalWrite(errorLedPin, HIGH);
-        delay(1000);
-        digitalWrite(errorLedPin, LOW);
-        delay(1000);
-      }
-      digitalWrite(errorLedPin, HIGH);
-      LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
-    }
-    numberOfWifiRestAttempts++;
-    wakeUpWifi();
-    delay(5000);
   }
 }

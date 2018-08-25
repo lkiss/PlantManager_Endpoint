@@ -12,7 +12,6 @@ struct Configuration
   double WaterTankRadius;
   double MinimumWaterThresholdPercentage;
   int TankType;
-  int MaximumNumberOfWifiRestAttempts;
 };
 
 #endif
