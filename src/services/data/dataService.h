@@ -13,7 +13,7 @@ private:
 
 public:
   DataService(ConfigService configService, JsonService jsonService);
-  Configuration getConfigurationFromServer();
+  Configuration *getConfigurationFromServer();
 };
 
 #endif

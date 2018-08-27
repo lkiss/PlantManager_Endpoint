@@ -10,7 +10,7 @@ class ConfigService
 private:
   static ConfigService *instance;
   JsonService jsonService;
-  Configuration config;
+  Configuration config[NUMBER_OF_DEVICES] = {{5, 750, 1}, {5, 750, 1}};
 
 public:
   ConfigService();
@@ -19,8 +19,10 @@ public:
   String getConfigurationJson();
   void setConfigurationJson(String &config);
 
-  Configuration getConfiguration();
-  void setConfiguration(Configuration config);
+  Configuration *getConfiguration();
+  void setConfiguration(Configuration config[]);
+
+  int getClosestWakeUpDelay();
 };
 
 #endif

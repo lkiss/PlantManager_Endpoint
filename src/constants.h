@@ -13,6 +13,10 @@
 #ifndef CONSTANTS
 #define CONSTANTS
 
+#ifndef NUMBER_OF_DEVICES
+#define NUMBER_OF_DEVICES 2
+#endif
+
 enum WaterTankType
 {
     CYLINDER = 0,

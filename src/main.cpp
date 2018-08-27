@@ -9,11 +9,13 @@
 int errorLedPin = LED_BUILTIN;
 int numberOfWifiRestAttempts = 0;
 int DHT11Pin = 11;
-int waterPumpPin = 9;
+int waterPumpPin00 = 9;
+int waterPumpPin01 = 8;
 int waterSensorEchoPin = 12;
 int waterSensorTriggerPin = 13;
 int sensorPowerPin = 10;
-int soilMoisturePin = A0;
+int soilMoisturePin00 = A0;
+int soilMoisturePin01 = A1;
 int wakeUpPin = INT0;
 int wifiWakeupPin = 4;
 int wifiReadyPin = 3;
@@ -23,17 +25,24 @@ bool isSensorPowered = false;
 
 int baudRate = 9600;
 
+SensorReading readings[NUMBER_OF_DEVICES] = {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}};
+
 RtcDS3231<TwoWire> Rtc(Wire);
 TemperatureSensor temperatureSensor(&DHT11Pin);
-SoilMoistureSensor soilMoistureSensor(soilMoisturePin);
-WaterPump waterPump(&waterPumpPin);
+SoilMoistureSensor soilMoistureSensor00(soilMoisturePin00);
+SoilMoistureSensor soilMoistureSensor01(soilMoisturePin01);
+WaterPump waterPump00(&waterPumpPin00);
+WaterPump waterPump01(&waterPumpPin01);
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(PRISM, 16, 6.5, 12);
+
+WaterPump waterPumps[2]{waterPump00, waterPump01};
+SoilMoistureSensor soilMoistureSensors[2];
 
 JsonService jsonService;
 ConfigService configService;
 DataService dataService(configService, jsonService);
-SensorService sensorService(waterTank, waterLevelSensor, waterPump, soilMoistureSensor, temperatureSensor);
+SensorService sensorService(waterTank, waterLevelSensor, waterPumps, soilMoistureSensors, temperatureSensor);
 
 void wakeUp() {}
 
@@ -105,10 +114,13 @@ void setup()
   pinMode(wifiWakeupPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
-  initializeRtc();  
+  Serial.begin(baudRate);
+  initializeRtc();
   wakeUpWifi();
 
   delay(3000);
+
+  Serial.end();
 }
 
 void loop()
@@ -127,22 +139,30 @@ void loop()
     String configString = Serial.readStringUntil('\n');
 
     configService.setConfigurationJson(configString);
-    Configuration config = configService.getConfiguration();
-
-    sensorService.updateSensorsParamaters(config);
+    Configuration *config = configService.getConfiguration();
 
     toggleSensors();
-    SensorReading reading = sensorService.getSensorReadings();
+    for (int deviceNumber = 0; deviceNumber < NUMBER_OF_DEVICES; deviceNumber++)
+    {
+      sensorService.updateSensorsParamaters(config, deviceNumber);
+      readings[deviceNumber] = sensorService.getSensorReadings(deviceNumber);
+    }
     toggleSensors();
 
-    String jsonResult = jsonService.convertSensorReadingsToJson(reading);
+    String jsonResult = jsonService.convertSensorReadingsToJson(readings);
     Serial.println(jsonResult);
     Serial.flush();
 
-    sensorService.water(reading);
+    for (int deviceNumber = 0; deviceNumber < NUMBER_OF_DEVICES; deviceNumber++)
+    {
+      sensorService.water(readings, deviceNumber);
+    }
+
+    // Serial.println("configService.getClosestWakeUpDelay()");
+    // Serial.println(configService.getClosestWakeUpDelay());
 
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
-    updateTimer(config.MeasuringIntervalInMinutes);
+    updateTimer(configService.getClosestWakeUpDelay());
 
     // Serial.print("MeasuringIntervalInMinutes: ");
     // Serial.println(config.MeasuringIntervalInMinutes);

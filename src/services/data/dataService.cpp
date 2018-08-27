@@ -6,9 +6,9 @@ DataService::DataService(ConfigService configService, JsonService jsonService)
     this->jsonService = jsonService;
 }
 
-Configuration DataService::getConfigurationFromServer()
+Configuration *DataService::getConfigurationFromServer()
 {
-    Configuration config = this->configService.getConfiguration();
+    Configuration *config = this->configService.getConfiguration();
 
     return config;
 }

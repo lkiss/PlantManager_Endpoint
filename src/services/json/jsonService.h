@@ -10,9 +10,9 @@
 class JsonService
 {
 public:
-  String convertSensorReadingsToJson(SensorReading sensorReading);
-  String convertConfigToJson(Configuration config);
-  Configuration convertJsonToConfig(String &configJson);
+  String convertSensorReadingsToJson(SensorReading *sensorReadings);
+  String convertConfigToJson(Configuration *config);
+  void convertJsonToConfig(String &configJson, Configuration *configuration);
 };
 
 #endif

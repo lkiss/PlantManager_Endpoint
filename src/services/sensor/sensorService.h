@@ -11,8 +11,8 @@ class SensorService
 private:
   ConfigService configService;
   WaterLevelSensor waterLevelSensor;
-  WaterPump waterPump;
-  SoilMoistureSensor soilMoistureSensor;
+  WaterPump *waterPumps;
+  SoilMoistureSensor *soilMoistureSensors;
   WaterTank waterTank;
   TemperatureSensor temperatureSensor;
 
@@ -21,12 +21,12 @@ public:
   SensorService(
       const WaterTank &waterTank,
       const WaterLevelSensor &waterLevelSensor,
-      const WaterPump &waterPump,
-      const SoilMoistureSensor &soilMoistureSensor,
+      WaterPump *waterPumps,
+      SoilMoistureSensor *soilMoistureSensors,
       const TemperatureSensor &temperatureSensor);
-  SensorReading getSensorReadings();
-  bool water(SensorReading reading);
-  void updateSensorsParamaters(Configuration config);
+  SensorReading getSensorReadings(int deviceNumber);
+  bool water(SensorReading *readings, int deviceNumber);
+  void updateSensorsParamaters(Configuration *config, int deviceNumber);
 };
 
 #endif
