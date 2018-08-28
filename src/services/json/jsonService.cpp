@@ -1,9 +1,8 @@
 #include "./jsonService.h"
 
-String JsonService::convertSensorReadingsToJson(SensorReading sensorReadings[])
+void JsonService::printSensorReadingJson(SensorReading sensorReadings[])
 {
-    const size_t bufferSize = JSON_ARRAY_SIZE(2) + 2 * JSON_OBJECT_SIZE(1) + 2 * JSON_OBJECT_SIZE(7);
-    String readingBuffer;
+    const size_t bufferSize = JSON_ARRAY_SIZE(2) + 2 * JSON_OBJECT_SIZE(1) + 2 * JSON_OBJECT_SIZE(6);
     DynamicJsonBuffer jsonBuffer(bufferSize);
 
     JsonArray &reading = jsonBuffer.createArray();
@@ -28,10 +27,9 @@ String JsonService::convertSensorReadingsToJson(SensorReading sensorReadings[])
     JsonObject &sensor01 = reading01.createNestedObject("sensor");
     sensor01["sensorId"] = SENSOR_ID;
 
-    reading.printTo(readingBuffer);
-    jsonBuffer.clear();
+    reading.printTo(Serial);
 
-    return readingBuffer;
+    jsonBuffer.clear();
 }
 
 String JsonService::convertConfigToJson(Configuration *configuration)

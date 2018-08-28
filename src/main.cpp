@@ -149,29 +149,16 @@ void loop()
     }
     toggleSensors();
 
-    String jsonResult = jsonService.convertSensorReadingsToJson(readings);
-    Serial.println(jsonResult);
-    Serial.flush();
+    jsonService.printSensorReadingJson(readings);
 
     for (int deviceNumber = 0; deviceNumber < NUMBER_OF_DEVICES; deviceNumber++)
     {
       sensorService.water(readings, deviceNumber);
     }
 
-    // Serial.println("configService.getClosestWakeUpDelay()");
-    // Serial.println(configService.getClosestWakeUpDelay());
-
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
     updateTimer(configService.getClosestWakeUpDelay());
 
-    // Serial.print("MeasuringIntervalInMinutes: ");
-    // Serial.println(config.MeasuringIntervalInMinutes);
-    // Serial.print("SoilMoistureThreshold: ");
-    // Serial.println(config.SoilMoistureThreshold);
-    // Serial.print("WateringTimeInSeconds: ");
-    // Serial.println(config.WateringTimeInSeconds);
-    // Serial.print("minimumWaterThresholdPercentage: ");
-    // Serial.println(config.MinimumWaterThresholdPercentage);
     Serial.end();
 
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
