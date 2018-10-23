@@ -33,11 +33,11 @@ SensorService::SensorService(
     this->configService = configService;
 }
 
-void SensorService::updateSensorsParamaters(Configuration config[], int deviceNumber)
+void SensorService::updateSensorParamaters(Configuration config, int deviceNumber)
 {
-    this->waterPumps[deviceNumber].updateWateringTime(config[deviceNumber].WateringTimeInSeconds);
-    this->soilMoistureSensors[deviceNumber].updateTresholdValues(config[deviceNumber].SoilMoistureThreshold);
-    this->waterTank.updateWaterTresholdValue(config[deviceNumber].MinimumWaterThresholdPercentage);
+    this->waterPumps[deviceNumber].updateWateringTime(config.WateringTimeInSeconds);
+    this->soilMoistureSensors[deviceNumber].updateTresholdValues(config.SoilMoistureThreshold);
+    this->waterTank.updateWaterTresholdValue(config.MinimumWaterThresholdPercentage);
 
     // Serial.print("WateringTimeInSeconds: ");
     // Serial.println(config[deviceNumber].WateringTimeInSeconds);
@@ -59,11 +59,11 @@ void SensorService::updateSensorsParamaters(Configuration config[], int deviceNu
     // Serial.println(config[deviceNumber].MinimumWaterThresholdPercentage);
 }
 
-bool SensorService::water(SensorReading *readings, int deviceNumber)
+bool SensorService::water(SensorReading reading, int deviceNumber)
 {
-    if (this->waterTank.isWaterLevelSufficient(readings[deviceNumber].waterLevel))
+    if (this->waterTank.isWaterLevelSufficient(reading.waterLevel))
     {
-        if (this->soilMoistureSensors[deviceNumber].isDry(readings[deviceNumber].soilMoisture))
+        if (this->soilMoistureSensors[deviceNumber].isDry(reading.soilMoisture))
         {
             this->waterPumps[deviceNumber].activateWaterPump();
         }

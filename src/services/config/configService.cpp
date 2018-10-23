@@ -4,13 +4,6 @@ ConfigService::ConfigService()
 {
 }
 
-ConfigService *ConfigService::getInstance()
-{
-  if (!instance)
-    instance = new ConfigService();
-  return instance;
-}
-
 String ConfigService::getConfigurationJson()
 {
   return jsonService.convertConfigToJson(this->config);
@@ -18,34 +11,40 @@ String ConfigService::getConfigurationJson()
 
 void ConfigService::setConfigurationJson(String &config)
 {
-  jsonService.convertJsonToConfig(config, this->config);
+  this->config = jsonService.convertJsonToConfig(config);
 }
 
-Configuration *ConfigService::getConfiguration()
+Configuration ConfigService::getConfiguration()
 {
   return this->config;
 }
 
-void ConfigService::setConfiguration(Configuration config[])
+void ConfigService::setConfiguration(Configuration config)
 {
   for (int deviceNumber = 0; deviceNumber < NUMBER_OF_DEVICES; deviceNumber++)
   {
-    this->config[deviceNumber].WateringTimeInSeconds = config[deviceNumber].WateringTimeInSeconds;
-    this->config[deviceNumber].SoilMoistureThreshold = config[deviceNumber].SoilMoistureThreshold;
-    this->config[deviceNumber].MeasuringIntervalInMinutes = config[deviceNumber].MeasuringIntervalInMinutes;
+    this->config.WateringTimeInSeconds = config.WateringTimeInSeconds;
+    this->config.SoilMoistureThreshold = config.SoilMoistureThreshold;
+    this->config.MeasuringIntervalInMinutes = config.MeasuringIntervalInMinutes;
   }
 }
 
-int ConfigService::getClosestWakeUpDelay()
+void ConfigService::addWakeUpDelay(int wakeUpDelay, int indexToPush)
+{
+  this->wakeUpDelays[indexToPush] = wakeUpDelay;
+}
+
+int ConfigService::getNextWakeUpDelay()
 {
   int closestWakeUpDelayInMinutes = 10080; // one week in minutes
   for (int deviceNumber = 0; deviceNumber < NUMBER_OF_DEVICES; deviceNumber++)
   {
-    if (closestWakeUpDelayInMinutes > this->config[deviceNumber].MeasuringIntervalInMinutes)
+    if (closestWakeUpDelayInMinutes > wakeUpDelays[deviceNumber])
     {
-      closestWakeUpDelayInMinutes = this->config[deviceNumber].MeasuringIntervalInMinutes;
+      closestWakeUpDelayInMinutes = wakeUpDelays[deviceNumber];
     }
   }
-
+  // Serial.println("Closest wakeup delay");
+  // Serial.println(closestWakeUpDelayInMinutes);
   return closestWakeUpDelayInMinutes;
 }

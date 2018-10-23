@@ -19,13 +19,12 @@ int soilMoisturePin01 = A1;
 int wakeUpPin = INT0;
 int wifiWakeupPin = 4;
 int wifiReadyPin = 3;
+int currentEndpointId = 0;
 
 bool isWifiPowered = false;
 bool isSensorPowered = false;
 
 int baudRate = 9600;
-
-SensorReading readings[NUMBER_OF_DEVICES] = {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}};
 
 RtcDS3231<TwoWire> Rtc(Wire);
 TemperatureSensor temperatureSensor(&DHT11Pin);
@@ -37,7 +36,7 @@ WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(PRISM, 16, 6.5, 12);
 
 WaterPump waterPumps[2]{waterPump00, waterPump01};
-SoilMoistureSensor soilMoistureSensors[2];
+SoilMoistureSensor soilMoistureSensors[2]{soilMoistureSensor00, soilMoisturePin01};
 
 JsonService jsonService;
 ConfigService configService;
@@ -115,49 +114,55 @@ void setup()
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
   Serial.begin(baudRate);
+  Serial.println("Initialize RTC");
   initializeRtc();
   wakeUpWifi();
 
-  delay(3000);
-
+  Serial.println("Begin processing");
   Serial.end();
 }
 
 void loop()
 {
-  if (digitalRead(wifiReadyPin) == HIGH)
+  if (digitalRead(wifiReadyPin) == HIGH && currentEndpointId < NUMBER_OF_DEVICES)
   {
     Serial.begin(baudRate);
     Serial.setTimeout(10000);
 
-    Serial.println(SENSOR_ID);
+    Serial.print(SENSOR_ID);
+    Serial.print(" ");
+    Serial.println(currentEndpointId);
 
     while (!Serial.available())
     {
+      yield();
     }
 
     String configString = Serial.readStringUntil('\n');
-
-    configService.setConfigurationJson(configString);
-    Configuration *config = configService.getConfiguration();
+    Configuration config = jsonService.convertJsonToConfig(configString);
+    configService.addWakeUpDelay(config.MeasuringIntervalInMinutes, currentEndpointId);
 
     toggleSensors();
-    for (int deviceNumber = 0; deviceNumber < NUMBER_OF_DEVICES; deviceNumber++)
-    {
-      sensorService.updateSensorsParamaters(config, deviceNumber);
-      readings[deviceNumber] = sensorService.getSensorReadings(deviceNumber);
-    }
+
+    sensorService.updateSensorParamaters(config, currentEndpointId);
+    SensorReading reading = sensorService.getSensorReadings(currentEndpointId);
+
     toggleSensors();
 
-    jsonService.printSensorReadingJson(readings);
+    jsonService.printSensorReadingJson(reading);
 
-    for (int deviceNumber = 0; deviceNumber < NUMBER_OF_DEVICES; deviceNumber++)
-    {
-      sensorService.water(readings, deviceNumber);
-    }
+    sensorService.water(reading, currentEndpointId);
 
+    currentEndpointId++;
+    wakeUpWifi();
+    delay(3000);
+  }
+  else if (currentEndpointId == NUMBER_OF_DEVICES)
+  {
+    currentEndpointId = 0;
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
-    updateTimer(configService.getClosestWakeUpDelay());
+    int nextWakeUpDelay = configService.getNextWakeUpDelay();
+    updateTimer(nextWakeUpDelay);
 
     Serial.end();
 

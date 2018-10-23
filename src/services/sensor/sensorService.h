@@ -25,8 +25,8 @@ public:
       SoilMoistureSensor *soilMoistureSensors,
       const TemperatureSensor &temperatureSensor);
   SensorReading getSensorReadings(int deviceNumber);
-  bool water(SensorReading *readings, int deviceNumber);
-  void updateSensorsParamaters(Configuration *config, int deviceNumber);
+  bool water(SensorReading reading, int deviceNumber);
+  void updateSensorParamaters(Configuration config, int deviceNumber);
 };
 
 #endif

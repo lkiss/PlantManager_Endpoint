@@ -8,21 +8,21 @@
 class ConfigService
 {
 private:
-  static ConfigService *instance;
   JsonService jsonService;
-  Configuration config[NUMBER_OF_DEVICES] = {{5, 750, 1}, {5, 750, 1}};
+  Configuration config;
+  int wakeUpDelays[NUMBER_OF_DEVICES];
 
 public:
   ConfigService();
-  static ConfigService *getInstance();
 
   String getConfigurationJson();
   void setConfigurationJson(String &config);
 
-  Configuration *getConfiguration();
-  void setConfiguration(Configuration config[]);
+  Configuration getConfiguration();
+  void setConfiguration(Configuration config);
 
-  int getClosestWakeUpDelay();
+  void addWakeUpDelay(int wakeUpDelay, int indexToPush);
+  int getNextWakeUpDelay();
 };
 
 #endif
