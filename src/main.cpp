@@ -113,13 +113,13 @@ void setup()
   pinMode(wifiWakeupPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
-  Serial.begin(baudRate);
-  Serial.println("Initialize RTC");
+  // Serial.begin(baudRate);
+  // Serial.println("Initialize RTC");
   initializeRtc();
   wakeUpWifi();
 
-  Serial.println("Begin processing");
-  Serial.end();
+  // Serial.println("Begin processing");
+  // Serial.end();
 }
 
 void loop()
@@ -154,8 +154,13 @@ void loop()
     sensorService.water(reading, currentEndpointId);
 
     currentEndpointId++;
-    wakeUpWifi();
-    delay(3000);
+    if (currentEndpointId != NUMBER_OF_DEVICES)
+    {
+      delay(3000);
+      wakeUpWifi();
+      delay(3000);
+    }
+    Serial.end();
   }
   else if (currentEndpointId == NUMBER_OF_DEVICES)
   {
@@ -163,8 +168,6 @@ void loop()
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
     int nextWakeUpDelay = configService.getNextWakeUpDelay();
     updateTimer(nextWakeUpDelay);
-
-    Serial.end();
 
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
     detachInterrupt(wakeUpPin);
