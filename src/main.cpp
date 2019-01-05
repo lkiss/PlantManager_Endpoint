@@ -1,12 +1,13 @@
-#include <RtcDS3231.h>
 #include <Wire.h>
+#include <RtcDS3231.h>
 #include "LowPower.h"
 
 #include "./devices/devices.h"
 #include "./services/services.h"
 #include "./constants.h"
+#include "./utility/utility.h"
 
-int errorLedPin = LED_BUILTIN;
+int statusLedPin = LED_BUILTIN;
 int numberOfWifiRestAttempts = 0;
 int DHT11Pin = 11;
 int waterPumpPin00 = 9;
@@ -43,6 +44,9 @@ ConfigService configService;
 DataService dataService(configService, jsonService);
 SensorService sensorService(waterTank, waterLevelSensor, waterPumps, soilMoistureSensors, temperatureSensor);
 
+Utility utilities;
+Configuration config;
+
 void wakeUp() {}
 
 void wakeUpWifi()
@@ -66,49 +70,72 @@ void toggleSensors()
   }
 }
 
-void updateTimer(int measuringIntervalInMinutes)
+void updateTimer(int measuringIntervalInMinutes, int currentEndpointId)
 {
   RtcDateTime now = Rtc.GetDateTime();
 
   RtcDateTime wakeUpTime = now + (measuringIntervalInMinutes * 60);
 
-  DS3231AlarmOne wakeTimer(
-      wakeUpTime.Day(),
-      wakeUpTime.Hour(),
-      wakeUpTime.Minute(),
-      wakeUpTime.Second(),
-      DS3231AlarmOneControl_HoursMinutesSecondsMatch);
-  Rtc.SetAlarmOne(wakeTimer);
+  if (currentEndpointId == 0)
+  {
+    DS3231AlarmOne wakeTimer01(
+        wakeUpTime.Day(),
+        wakeUpTime.Hour(),
+        wakeUpTime.Minute(),
+        wakeUpTime.Second(),
+        DS3231AlarmOneControl_HoursMinutesSecondsMatch);
+    Rtc.SetAlarmOne(wakeTimer01);
+  }
+  else if (currentEndpointId == 0)
+  {
+    DS3231AlarmTwo wakeTimer02(
+        wakeUpTime.Day(),
+        wakeUpTime.Hour(),
+        wakeUpTime.Minute(),
+        DS3231AlarmTwoControl_HoursMinutesMatch);
+    Rtc.SetAlarmTwo(wakeTimer02);
+  }
+
   Rtc.LatchAlarmsTriggeredFlags();
+  // Serial.println("Timer updated");
 }
 
 void initializeRtc()
 {
+  Rtc.Begin();
+
   RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
+  // Serial.println("After RtcDateTime");
 
   if (!Rtc.IsDateTimeValid())
   {
     Rtc.SetDateTime(compiled);
   }
 
+  // Serial.println("After IsDateTimeValid");
+
   if (!Rtc.GetIsRunning())
   {
     Rtc.SetIsRunning(true);
   }
 
+  // Serial.println("After GetIsRunning");
+
   RtcDateTime now = Rtc.GetDateTime();
+  // Serial.println("After Rtc.GetDateTime()");
   if (now < compiled)
   {
     Rtc.SetDateTime(compiled);
   }
 
+  // Serial.println("Before Enable32kHzPin");
   Rtc.Enable32kHzPin(false);
   Rtc.SetSquareWavePin(DS3231SquareWavePin_ModeAlarmBoth);
 }
 
 void setup()
 {
-  pinMode(errorLedPin, OUTPUT);
+  pinMode(statusLedPin, OUTPUT);
   pinMode(sensorPowerPin, OUTPUT);
   pinMode(wifiWakeupPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
@@ -117,15 +144,13 @@ void setup()
   // Serial.println("Initialize RTC");
   initializeRtc();
   wakeUpWifi();
-
-  // Serial.println("Begin processing");
-  // Serial.end();
 }
 
 void loop()
 {
   if (digitalRead(wifiReadyPin) == HIGH && currentEndpointId < NUMBER_OF_DEVICES)
   {
+    utilities.oscillatePin(statusLedPin, 500, 1);
     Serial.begin(baudRate);
     Serial.setTimeout(10000);
 
@@ -139,8 +164,10 @@ void loop()
     }
 
     String configString = Serial.readStringUntil('\n');
-    Configuration config = jsonService.convertJsonToConfig(configString);
+    config = jsonService.convertJsonToConfig(configString);
     configService.addWakeUpDelay(config.MeasuringIntervalInMinutes, currentEndpointId);
+
+    // Serial.println("Before toggleSensors");
 
     toggleSensors();
 
@@ -149,14 +176,17 @@ void loop()
 
     toggleSensors();
 
+    // Serial.println("After toggleSensors");
+
     jsonService.printSensorReadingJson(reading);
 
     sensorService.water(reading, currentEndpointId);
 
     currentEndpointId++;
-    if (currentEndpointId != NUMBER_OF_DEVICES)
+    if (currentEndpointId < NUMBER_OF_DEVICES)
     {
       delay(3000);
+      yield();
       wakeUpWifi();
       delay(3000);
     }
@@ -164,13 +194,17 @@ void loop()
   }
   else if (currentEndpointId == NUMBER_OF_DEVICES)
   {
-    currentEndpointId = 0;
-    attachInterrupt(wakeUpPin, wakeUp, FALLING);
-    int nextWakeUpDelay = configService.getNextWakeUpDelay();
-    updateTimer(nextWakeUpDelay);
+    updateTimer(config.MeasuringIntervalInMinutes, currentEndpointId);
 
+    utilities.oscillatePin(statusLedPin, 500, 2);
+
+    attachInterrupt(wakeUpPin, wakeUp, FALLING);
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
     detachInterrupt(wakeUpPin);
+
+    currentEndpointId = 0;
+
+    utilities.oscillatePin(statusLedPin, 500, 3);
 
     wakeUpWifi();
     delay(3000);
