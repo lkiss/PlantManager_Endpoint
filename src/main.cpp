@@ -22,6 +22,8 @@ int wifiWakeupPin = 4;
 int wifiReadyPin = 3;
 int currentEndpointId = 0;
 
+int waterSensorPowerPin = 7;
+
 bool isWifiPowered = false;
 bool isSensorPowered = false;
 
@@ -61,40 +63,30 @@ void toggleSensors()
   if (!isSensorPowered)
   {
     digitalWrite(sensorPowerPin, HIGH);
+    digitalWrite(waterSensorPowerPin, HIGH);
     isSensorPowered = true;
   }
   else
   {
     digitalWrite(sensorPowerPin, LOW);
+    digitalWrite(waterSensorPowerPin, LOW);
     isSensorPowered = false;
   }
 }
 
-void updateTimer(int measuringIntervalInMinutes, int currentEndpointId)
+void updateTimer(int measuringIntervalInMinutes)
 {
   RtcDateTime now = Rtc.GetDateTime();
 
   RtcDateTime wakeUpTime = now + (measuringIntervalInMinutes * 60);
 
-  if (currentEndpointId == 0)
-  {
-    DS3231AlarmOne wakeTimer01(
-        wakeUpTime.Day(),
-        wakeUpTime.Hour(),
-        wakeUpTime.Minute(),
-        wakeUpTime.Second(),
-        DS3231AlarmOneControl_HoursMinutesSecondsMatch);
-    Rtc.SetAlarmOne(wakeTimer01);
-  }
-  else if (currentEndpointId == 0)
-  {
-    DS3231AlarmTwo wakeTimer02(
-        wakeUpTime.Day(),
-        wakeUpTime.Hour(),
-        wakeUpTime.Minute(),
-        DS3231AlarmTwoControl_HoursMinutesMatch);
-    Rtc.SetAlarmTwo(wakeTimer02);
-  }
+  DS3231AlarmOne wakeTimer01(
+      wakeUpTime.Day(),
+      wakeUpTime.Hour(),
+      wakeUpTime.Minute(),
+      wakeUpTime.Second(),
+      DS3231AlarmOneControl_HoursMinutesSecondsMatch);
+  Rtc.SetAlarmOne(wakeTimer01);
 
   Rtc.LatchAlarmsTriggeredFlags();
   // Serial.println("Timer updated");
@@ -137,6 +129,7 @@ void setup()
 {
   pinMode(statusLedPin, OUTPUT);
   pinMode(sensorPowerPin, OUTPUT);
+  pinMode(waterSensorPowerPin, OUTPUT);
   pinMode(wifiWakeupPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
@@ -180,6 +173,8 @@ void loop()
 
     jsonService.printSensorReadingJson(reading);
 
+    utilities.oscillatePin(statusLedPin, 500, 2);
+
     sensorService.water(reading, currentEndpointId);
 
     currentEndpointId++;
@@ -194,9 +189,9 @@ void loop()
   }
   else if (currentEndpointId == NUMBER_OF_DEVICES)
   {
-    updateTimer(config.MeasuringIntervalInMinutes, currentEndpointId);
+    updateTimer(config.MeasuringIntervalInMinutes);
 
-    utilities.oscillatePin(statusLedPin, 500, 2);
+    utilities.oscillatePin(statusLedPin, 500, 3);
 
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
