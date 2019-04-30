@@ -4,20 +4,31 @@
 
 WaterPump::WaterPump() {}
 
-WaterPump::WaterPump(int *waterPumpPin)
+WaterPump::WaterPump(int waterPumpPin)
 {
-    pinMode(*waterPumpPin, OUTPUT);
-    digitalWrite(*waterPumpPin, LOW);
-    this->waterPumpPin = *waterPumpPin;
+    this->waterPumpPin = waterPumpPin;
+    setupWaterPump();
+}
+
+WaterPump::WaterPump(int waterPumpPin, int statusLedPin)
+{
+    this->waterPumpPin = waterPumpPin;
+    this->statusLedPin = statusLedPin;
+    setupWaterPump();
 }
 
 bool WaterPump::activateWaterPump()
 {
-    //Log debug
+    bool indicateWatering = this->statusLedPin != -1 ? true : false;
+
+    indicateWatering ? digitalWrite(this->statusLedPin, HIGH) : digitalWrite(this->statusLedPin, LOW);
+
     digitalWrite(this->waterPumpPin, HIGH);
     delay(this->newWateringTimeInSeconds * 1000);
     // Serial.println(this->newWateringTimeInSeconds);
     digitalWrite(this->waterPumpPin, LOW);
+
+    indicateWatering ? digitalWrite(this->statusLedPin, LOW) : digitalWrite(this->statusLedPin, LOW);
     return true;
 }
 
@@ -26,4 +37,10 @@ void WaterPump::updateWateringTime(int &newWateringTimeInSeconds)
     this->newWateringTimeInSeconds = newWateringTimeInSeconds;
     // Serial.print("Watering time in seconds: ");
     // Serial.println(this->newWateringTimeInSeconds);
+}
+
+void WaterPump::setupWaterPump()
+{
+    pinMode(this->waterPumpPin, OUTPUT);
+    digitalWrite(this->waterPumpPin, LOW);
 }

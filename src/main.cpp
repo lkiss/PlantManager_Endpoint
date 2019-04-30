@@ -33,8 +33,8 @@ RtcDS3231<TwoWire> Rtc(Wire);
 TemperatureSensor temperatureSensor(&DHT11Pin);
 SoilMoistureSensor soilMoistureSensor00(soilMoisturePin00);
 SoilMoistureSensor soilMoistureSensor01(soilMoisturePin01);
-WaterPump waterPump00(&waterPumpPin00);
-WaterPump waterPump01(&waterPumpPin01);
+WaterPump waterPump00(waterPumpPin00, statusLedPin);
+WaterPump waterPump01(waterPumpPin01, statusLedPin);
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(PRISM, 16, 6.5, 12);
 
@@ -189,6 +189,9 @@ void loop()
   }
   else if (currentEndpointId == NUMBER_OF_DEVICES)
   {
+    // Serial.println("MeasurinIntervalInMinutes");
+    // Serial.println(config.MeasuringIntervalInMinutes);
+
     updateTimer(config.MeasuringIntervalInMinutes);
 
     utilities.oscillatePin(statusLedPin, 500, 3);

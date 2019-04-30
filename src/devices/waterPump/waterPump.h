@@ -6,10 +6,14 @@ class WaterPump
 private:
   int waterPumpPin = 0;
   int newWateringTimeInSeconds = 5;
+  int statusLedPin = -1;
+
+  void setupWaterPump();
 
 public:
   WaterPump();
-  WaterPump(int *waterPumpPin);
+  WaterPump(int waterPumpPin);
+  WaterPump(int waterPumpPin, int statusLedPin);
   bool activateWaterPump();
   void updateWateringTime(int &newWateringTimeInSeconds);
 };
