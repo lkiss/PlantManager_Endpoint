@@ -43,10 +43,10 @@ enum SoilMoistureUnitOfMeasurement
 
 struct DimensionsInCentimeters
 {
-    double length;
-    double width;
-    double height;
-    double radius;
+    double Length;
+    double Width;
+    double Height;
+    double Radius;
 };
 
 #endif

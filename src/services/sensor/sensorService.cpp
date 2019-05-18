@@ -56,14 +56,15 @@ void SensorService::updateSensorParamaters(Configuration config, int deviceNumbe
 
     this->waterPumps[deviceNumber].updateWateringTime(config.WateringTimeInSeconds);
     this->soilMoistureSensors[deviceNumber].updateTresholdValues(config.SoilMoistureThreshold);
-    this->waterTank.updateWaterTresholdValue(config.MinimumWaterThresholdPercentage);
+    this->waterTank.UpdateWaterTresholdValue(config.MinimumWaterThresholdPercentage);
+    this->waterTank.UpdateWaterTankDimensions(config.TankType, config.WaterTankDimensions);
 
     // Serial.println("After updateSensorParamaters");
 }
 
 bool SensorService::water(SensorReading reading, int deviceNumber)
 {
-    if (this->waterTank.isWaterLevelSufficient(reading.waterLevel))
+    if (this->waterTank.IsWaterLevelSufficient(reading.waterLevel))
     {
         if (this->soilMoistureSensors[deviceNumber].isDry(reading.soilMoisture))
         {

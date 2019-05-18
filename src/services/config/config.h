@@ -1,17 +1,16 @@
 #ifndef CONFIGURATION
 #define CONFIGURATION
 
+#include "../../constants.h"
+
 struct Configuration
 {
   int SoilMoistureThreshold;
   int WateringTimeInSeconds;
   int MeasuringIntervalInMinutes;
-  double WaterTankLength;
-  double WaterTankWidth;
-  double WaterTankHeight;
-  double WaterTankRadius;
   double MinimumWaterThresholdPercentage;
-  int TankType;
+  DimensionsInCentimeters WaterTankDimensions;
+  WaterTankType TankType;
 };
 
 #endif

@@ -3,21 +3,18 @@
 
 WaterTank::WaterTank() {}
 
-WaterTank::WaterTank(int tankType, DimensionsInCentimeters dimensions)
+WaterTank::WaterTank(WaterTankType tankType, DimensionsInCentimeters dimensions)
 {
-    this->waterTankType = tankType;
-    this->dimensions = dimensions;
-
-    CalculateCapacityCC();
+    this->UpdateWaterTankDimensions(tankType, dimensions);
 }
 
-WaterTank::WaterTank(int tankType, double lengthCM, double widthCM, double heightCM, double radiusCM)
+WaterTank::WaterTank(WaterTankType tankType, double lengthCM, double widthCM, double heightCM, double radiusCM)
 {
     DimensionsInCentimeters dimensions;
-    dimensions.length = lengthCM;
-    dimensions.width = widthCM;
-    dimensions.height = heightCM;
-    dimensions.radius = radiusCM;
+    dimensions.Length = lengthCM;
+    dimensions.Width = widthCM;
+    dimensions.Height = heightCM;
+    dimensions.Radius = radiusCM;
 
     this->waterTankType = tankType;
     this->dimensions = dimensions;
@@ -25,7 +22,7 @@ WaterTank::WaterTank(int tankType, double lengthCM, double widthCM, double heigh
     CalculateCapacityCC();
 }
 
-void WaterTank::updateWaterTresholdValue(double minimumWaterThresholdPercentage)
+void WaterTank::UpdateWaterTresholdValue(double minimumWaterThresholdPercentage)
 {
     this->minimumWaterThresholdPercentage = minimumWaterThresholdPercentage;
 }
@@ -38,19 +35,19 @@ double WaterTank::CalculateVolume(double height)
     {
     case CYLINDER: //CYLINDER
     {
-        volume = pow(this->dimensions.radius, 2) * PI * height;
+        volume = pow(this->dimensions.Radius, 2) * PI * height;
         break;
     }
 
     case CUBE: //CUBE
     {
-        volume = pow(this->dimensions.width, 2) * height;
+        volume = pow(this->dimensions.Width, 2) * height;
         break;
     }
 
     case PRISM: //PRISM
     {
-        volume = this->dimensions.width * this->dimensions.length * height;
+        volume = this->dimensions.Width * this->dimensions.Length * height;
         break;
     }
     }
@@ -60,14 +57,14 @@ double WaterTank::CalculateVolume(double height)
 
 void WaterTank::CalculateCapacityCC()
 {
-    double volume = this->CalculateVolume(this->dimensions.height);
+    double volume = this->CalculateVolume(this->dimensions.Height);
 
     this->waterTankVolumeCC = volume;
 }
 
 double WaterTank::GetRemainingInPercentage(double height)
 {
-    double waterHeight = height <= 2 ? this->dimensions.height : this->dimensions.height - height;
+    double waterHeight = height <= 2 ? this->dimensions.Height : this->dimensions.Height - height;
     double waterVolume = this->CalculateVolume(waterHeight);
 
     double result = (waterVolume / this->waterTankVolumeCC) * 100;
@@ -84,7 +81,15 @@ double WaterTank::GetRemainingInPercentage(double height)
     return result;
 }
 
-bool WaterTank::isWaterLevelSufficient(double remainingWaterInPercentage)
+bool WaterTank::IsWaterLevelSufficient(double remainingWaterInPercentage)
 {
     return this->minimumWaterThresholdPercentage >= remainingWaterInPercentage || remainingWaterInPercentage == -1 ? false : true;
+}
+
+void WaterTank::UpdateWaterTankDimensions(WaterTankType tankType, DimensionsInCentimeters dimensions)
+{
+    this->waterTankType = tankType;
+    this->dimensions = dimensions;
+
+    CalculateCapacityCC();
 }

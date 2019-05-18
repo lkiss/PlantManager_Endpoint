@@ -3,29 +3,27 @@
 void JsonService::printSensorReadingJson(SensorReading sensorReading)
 {
     const size_t bufferSize = JSON_OBJECT_SIZE(5);
-    DynamicJsonBuffer jsonBuffer(bufferSize);
+    DynamicJsonDocument jsonDocument(bufferSize);
 
-    JsonObject &reading = jsonBuffer.createObject();
+    JsonObject reading = jsonDocument.to<JsonObject>();
 
     reading["soilMoisture"] = sensorReading.soilMoisture;
     reading["waterLevel"] = sensorReading.waterLevel;
     reading["humidity"] = sensorReading.humidity;
     reading["temperature"] = sensorReading.temperature;
 
-    reading.printTo(Serial);
+    serializeJson(jsonDocument, Serial);
 
-    jsonBuffer.clear();
+    jsonDocument.clear();
 }
 
 String JsonService::convertConfigToJson(Configuration configuration)
 {
     String jsonMessage;
-    DynamicJsonBuffer jsonBuffer(250);
+    DynamicJsonDocument jsonDocument(250);
 
-    JsonObject &config = jsonBuffer.createObject();
-
-    config.printTo(jsonMessage);
-    jsonBuffer.clear();
+    serializeJson(jsonDocument, Serial);
+    jsonDocument.clear();
 
     return jsonMessage;
 }
@@ -35,24 +33,29 @@ Configuration JsonService::convertJsonToConfig(String &configJson)
     Configuration configuration;
     const size_t bufferSize = JSON_OBJECT_SIZE(4) + 130;
 
-    DynamicJsonBuffer buffer(bufferSize);
-    JsonObject &config = buffer.parseObject(const_cast<char *>(configJson.c_str()));
+    DynamicJsonDocument jsonDocument(bufferSize);
+    const DeserializationError error = deserializeJson(jsonDocument, const_cast<char *>(configJson.c_str()));
 
-    if (config.success())
+    if (!error)
     {
-        configuration.SoilMoistureThreshold = config["idealSoilMoistureValue"].as<int>();
-        configuration.WateringTimeInSeconds = config["wateringTimeInSeconds"].as<int>();
-        configuration.MeasuringIntervalInMinutes = config["measuringIntervalInMinutes"].as<int>();
-        configuration.MinimumWaterThresholdPercentage = config["minimumWaterThresholdPercentage"].as<double>();
+        configuration.SoilMoistureThreshold = jsonDocument["idealSoilMoistureValue"].as<int>();
+        configuration.WateringTimeInSeconds = jsonDocument["wateringTimeInSeconds"].as<int>();
+        configuration.MeasuringIntervalInMinutes = jsonDocument["measuringIntervalInMinutes"].as<int>();
+        configuration.MinimumWaterThresholdPercentage = jsonDocument["minimumWaterThresholdPercentage"].as<double>();
+
+        configuration.WaterTankDimensions.Width = jsonDocument["waterTankWidth"].as<double>();
+        configuration.WaterTankDimensions.Length = jsonDocument["waterTankLength"].as<double>();
+        configuration.WaterTankDimensions.Height = jsonDocument["waterTankHeight"].as<double>();
+        configuration.WaterTankDimensions.Radius = jsonDocument["waterTankRadius"].as<double>();
+        configuration.TankType = jsonDocument["waterTankType"].as<int>();
     }
     else
     {
-        config.invalid().prettyPrintTo(Serial);
         Serial.println("Parse failed for configJson");
         Serial.println(configJson);
     }
 
-    buffer.clear();
+    jsonDocument.clear();
 
     return configuration;
 }

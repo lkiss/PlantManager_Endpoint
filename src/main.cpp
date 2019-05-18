@@ -36,7 +36,7 @@ SoilMoistureSensor soilMoistureSensor01(soilMoisturePin01);
 WaterPump waterPump00(waterPumpPin00, statusLedPin);
 WaterPump waterPump01(waterPumpPin01, statusLedPin);
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
-WaterTank waterTank(PRISM, 16, 6.5, 12);
+WaterTank waterTank(CYLINDER, 0, 0, 10, 10);
 
 WaterPump waterPumps[2]{waterPump00, waterPump01};
 SoilMoistureSensor soilMoistureSensors[2]{soilMoistureSensor00, soilMoisturePin01};
