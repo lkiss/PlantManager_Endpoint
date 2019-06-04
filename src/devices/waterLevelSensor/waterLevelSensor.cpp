@@ -19,18 +19,18 @@ long WaterLevelSensor::getMissingWaterColumHeighCM()
     int minimumRange = 0;
 
     digitalWrite(this->triggerPin, LOW);
-    delayMicroseconds(2);
+    delayMicroseconds(50);
 
     digitalWrite(this->triggerPin, HIGH);
-    delayMicroseconds(10);
+    delayMicroseconds(50);
 
     digitalWrite(this->triggerPin, LOW);
     duration = pulseIn(this->echoPin, HIGH);
 
     distance = duration / 58.2;
 
-    Serial.println("Missing height");
-    Serial.println(distance);
+    // Serial.println("Missing height");
+    // Serial.println(distance);
 
     if (distance >= maximumRange || distance <= minimumRange)
     {

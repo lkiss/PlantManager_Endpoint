@@ -31,6 +31,12 @@ double WaterTank::CalculateVolume(double height)
 {
     double volume = 0;
 
+    // Serial.println("this->waterTankType");
+    // Serial.println(this->waterTankType);
+
+    // Serial.println("height");
+    // Serial.println(height);
+
     switch (this->waterTankType)
     {
     case CYLINDER: //CYLINDER
@@ -66,6 +72,12 @@ double WaterTank::GetRemainingInPercentage(double height)
 {
     double waterHeight = height <= 2 ? this->dimensions.Height : this->dimensions.Height - height;
     double waterVolume = this->CalculateVolume(waterHeight);
+
+    // Serial.println("waterHeight");
+    // Serial.println(waterHeight);
+
+    // Serial.println("this->waterTankVolumeCC");
+    // Serial.println(this->waterTankVolumeCC);
 
     double result = (waterVolume / this->waterTankVolumeCC) * 100;
 
@@ -118,12 +130,16 @@ void WaterTank::UpdateWaterTankDimensions(WaterTankType tankType, DimensionsInCe
     // Serial.println("Current Radius: ");
     // Serial.println(this->dimensions.Radius);
 
-    if(dimensions.Length == 0 && dimensions.Width == 0 && dimensions.Height == 0 && dimensions.Radius == 0){
+    if (dimensions.Length == 0 && dimensions.Width == 0 && dimensions.Height == 0 && dimensions.Radius == 0)
+    {
         return;
     }
 
     this->waterTankType = tankType;
-    this->dimensions = dimensions;
+    this->dimensions.Height = dimensions.Height;
+    this->dimensions.Length = dimensions.Length;
+    this->dimensions.Width = dimensions.Width;
+    this->dimensions.Radius = dimensions.Radius;
 
     // Serial.println("New WaterTankType: ");
     // Serial.println(this->waterTankType);
