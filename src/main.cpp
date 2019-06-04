@@ -97,6 +97,7 @@ void initializeRtc()
   Rtc.Begin();
 
   RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
+  
   // Serial.println("After RtcDateTime");
 
   if (!Rtc.IsDateTimeValid())
@@ -133,7 +134,7 @@ void setup()
   pinMode(wifiWakeupPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
-  // Serial.begin(baudRate);
+  Serial.begin(baudRate);
   // Serial.println("Initialize RTC");
   initializeRtc();
   wakeUpWifi();
@@ -158,7 +159,7 @@ void loop()
 
     String configString = Serial.readStringUntil('\n');
     config = jsonService.convertJsonToConfig(configString);
-    configService.addWakeUpDelay(config.MeasuringIntervalInMinutes, currentEndpointId);
+    // configService.addWakeUpDelay(config.MeasuringIntervalInMinutes, currentEndpointId);
 
     // Serial.println("Before toggleSensors");
 

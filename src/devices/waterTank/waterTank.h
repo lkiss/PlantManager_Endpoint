@@ -1,6 +1,9 @@
-#include "../../constants.h"
 #ifndef WATER_TANK
 #define WATER_TANK
+
+#include "../../constants.h"
+#include <Arduino.h>
+
 class WaterTank
 {
 private:

@@ -29,11 +29,15 @@ long WaterLevelSensor::getMissingWaterColumHeighCM()
 
     distance = duration / 58.2;
 
+    Serial.println("Missing height");
+    Serial.println(distance);
+
     if (distance >= maximumRange || distance <= minimumRange)
     {
         distance = -1;
     }
 
     delay(50);
+    
     return distance;
 }

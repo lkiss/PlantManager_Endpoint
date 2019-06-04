@@ -31,9 +31,9 @@ String JsonService::convertConfigToJson(Configuration configuration)
 Configuration JsonService::convertJsonToConfig(String &configJson)
 {
     Configuration configuration;
-    const size_t bufferSize = JSON_OBJECT_SIZE(4) + 130;
+    const size_t capacity  = JSON_OBJECT_SIZE(9);
 
-    DynamicJsonDocument jsonDocument(bufferSize);
+    DynamicJsonDocument jsonDocument(capacity);
     const DeserializationError error = deserializeJson(jsonDocument, const_cast<char *>(configJson.c_str()));
 
     if (!error)
@@ -43,10 +43,10 @@ Configuration JsonService::convertJsonToConfig(String &configJson)
         configuration.MeasuringIntervalInMinutes = jsonDocument["measuringIntervalInMinutes"].as<int>();
         configuration.MinimumWaterThresholdPercentage = jsonDocument["minimumWaterThresholdPercentage"].as<double>();
 
-        configuration.WaterTankDimensions.Width = jsonDocument["waterTankWidth"].as<double>();
-        configuration.WaterTankDimensions.Length = jsonDocument["waterTankLength"].as<double>();
-        configuration.WaterTankDimensions.Height = jsonDocument["waterTankHeight"].as<double>();
-        configuration.WaterTankDimensions.Radius = jsonDocument["waterTankRadius"].as<double>();
+        configuration.WaterTankDimensions.Width = jsonDocument["waterTankWidthInCM"].as<double>();
+        configuration.WaterTankDimensions.Length = jsonDocument["waterTankLengthInCM"].as<double>();
+        configuration.WaterTankDimensions.Height = jsonDocument["waterTankHeightInCM"].as<double>();
+        configuration.WaterTankDimensions.Radius = jsonDocument["waterTankRadiusInCM"].as<double>();
         configuration.TankType = jsonDocument["waterTankType"].as<int>();
     }
     else

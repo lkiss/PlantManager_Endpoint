@@ -88,8 +88,57 @@ bool WaterTank::IsWaterLevelSufficient(double remainingWaterInPercentage)
 
 void WaterTank::UpdateWaterTankDimensions(WaterTankType tankType, DimensionsInCentimeters dimensions)
 {
+    // Serial.println("Passed WaterTankType: ");
+    // Serial.println(tankType);
+
+    // Serial.println("Passed Length: ");
+    // Serial.println(dimensions.Length);
+
+    // Serial.println("Passed Width: ");
+    // Serial.println(dimensions.Width);
+
+    // Serial.println("Passed Height: ");
+    // Serial.println(dimensions.Height);
+
+    // Serial.println("Passed Radius: ");
+    // Serial.println(dimensions.Radius);
+
+    // Serial.println("Current WaterTankType: ");
+    // Serial.println(this->waterTankType);
+
+    // Serial.println("Current Length: ");
+    // Serial.println(this->dimensions.Length);
+
+    // Serial.println("Current Width: ");
+    // Serial.println(this->dimensions.Width);
+
+    // Serial.println("Current Height: ");
+    // Serial.println(this->dimensions.Height);
+
+    // Serial.println("Current Radius: ");
+    // Serial.println(this->dimensions.Radius);
+
+    if(dimensions.Length == 0 && dimensions.Width == 0 && dimensions.Height == 0 && dimensions.Radius == 0){
+        return;
+    }
+
     this->waterTankType = tankType;
     this->dimensions = dimensions;
+
+    // Serial.println("New WaterTankType: ");
+    // Serial.println(this->waterTankType);
+
+    // Serial.println("New Length: ");
+    // Serial.println(this->dimensions.Length);
+
+    // Serial.println("New Width: ");
+    // Serial.println(this->dimensions.Width);
+
+    // Serial.println("New Height: ");
+    // Serial.println(this->dimensions.Height);
+
+    // Serial.println("New Radius: ");
+    // Serial.println(this->dimensions.Radius);
 
     CalculateCapacityCC();
 }
