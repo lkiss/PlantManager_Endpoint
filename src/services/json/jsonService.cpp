@@ -38,16 +38,16 @@ Configuration JsonService::convertJsonToConfig(String &configJson)
 
     if (!error)
     {
-        configuration.SoilMoistureThreshold = jsonDocument["idealSoilMoistureValue"].as<int>();
-        configuration.WateringTimeInSeconds = jsonDocument["wateringTimeInSeconds"].as<int>();
-        configuration.MeasuringIntervalInMinutes = jsonDocument["measuringIntervalInMinutes"].as<int>();
-        configuration.MinimumWaterThresholdPercentage = jsonDocument["minimumWaterThresholdPercentage"].as<double>();
+        configuration.SoilMoistureThreshold = jsonDocument["ismv"].as<int>();
+        configuration.WateringTimeInSeconds = jsonDocument["wtis"].as<int>();
+        configuration.MeasuringIntervalInMinutes = jsonDocument["miim"].as<int>();
+        configuration.MinimumWaterThresholdPercentage = jsonDocument["mwtp"].as<double>();
 
-        configuration.WaterTankDimensions.Width = jsonDocument["waterTankWidthInCM"].as<double>();
-        configuration.WaterTankDimensions.Length = jsonDocument["waterTankLengthInCM"].as<double>();
-        configuration.WaterTankDimensions.Height = jsonDocument["waterTankHeightInCM"].as<double>();
-        configuration.WaterTankDimensions.Radius = jsonDocument["waterTankRadiusInCM"].as<double>();
-        configuration.TankType = jsonDocument["waterTankType"].as<int>();
+        configuration.WaterTankDimensions.Width = jsonDocument["wtwicm"].as<double>();
+        configuration.WaterTankDimensions.Length = jsonDocument["wtlicm"].as<double>();
+        configuration.WaterTankDimensions.Height = jsonDocument["wthicm"].as<double>();
+        configuration.WaterTankDimensions.Radius = jsonDocument["wtricm"].as<double>();
+        configuration.TankType = jsonDocument["wtt"].as<int>();
     }
     else
     {

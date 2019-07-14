@@ -97,7 +97,7 @@ void initializeRtc()
   Rtc.Begin();
 
   RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-  
+
   // Serial.println("After RtcDateTime");
 
   if (!Rtc.IsDateTimeValid())
@@ -190,8 +190,12 @@ void loop()
   }
   else if (currentEndpointId == NUMBER_OF_DEVICES)
   {
+    // Serial.begin(baudRate);
+    // Serial.println("NUMBER_OF_DEVICES: ");
+    // Serial.println(NUMBER_OF_DEVICES);
     // Serial.println("MeasurinIntervalInMinutes");
     // Serial.println(config.MeasuringIntervalInMinutes);
+    // Serial.end();
 
     updateTimer(config.MeasuringIntervalInMinutes);
 
@@ -206,6 +210,11 @@ void loop()
     utilities.oscillatePin(statusLedPin, 500, 3);
 
     wakeUpWifi();
+
+    // Serial.begin(baudRate);
+    // Serial.println("Wakeup");
+    // Serial.end();
+
     delay(3000);
   }
 }
