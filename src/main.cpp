@@ -38,8 +38,8 @@ WaterPump waterPump01(waterPumpPin01, statusLedPin);
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(CYLINDER, 0, 0, 10, 10);
 
-WaterPump waterPumps[2]{waterPump00, waterPump01};
-SoilMoistureSensor soilMoistureSensors[2]{soilMoistureSensor00, soilMoisturePin01};
+WaterPump waterPumps[NUMBER_OF_DEVICES]{waterPump00, waterPump01};
+SoilMoistureSensor soilMoistureSensors[NUMBER_OF_DEVICES]{soilMoistureSensor00, soilMoisturePin01};
 
 JsonService jsonService;
 ConfigService configService;
