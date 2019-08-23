@@ -1,6 +1,7 @@
 #ifndef SENSOR_SERVICE
 #define SENSOR_SERVICE
 
+#include <CD74HC4067.h>
 #include "../../devices/devices.h"
 #include "./sensorReading.h"
 #include "../../constants.h"
@@ -24,9 +25,9 @@ public:
       WaterPump *waterPumps,
       SoilMoistureSensor *soilMoistureSensors,
       const TemperatureSensor &temperatureSensor);
-  SensorReading getSensorReadings(int deviceNumber);
-  bool water(SensorReading reading, int deviceNumber);
-  void updateSensorParamaters(Configuration config, int deviceNumber);
+  SensorReading getSensorReadings(int endpointIndex);
+  bool water(SensorReading reading, int endpointIndex);
+  void updateSensorParamaters(Configuration config, int endpointIndex);
 };
 
 #endif

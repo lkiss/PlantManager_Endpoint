@@ -9,37 +9,73 @@
 
 int statusLedPin = LED_BUILTIN;
 int numberOfWifiRestAttempts = 0;
-int DHT11Pin = 11;
+int DHT11Pin = 10;
 int waterPumpPin00 = 9;
 int waterPumpPin01 = 8;
-int waterSensorEchoPin = 12;
-int waterSensorTriggerPin = 13;
-int sensorPowerPin = 10;
-int soilMoisturePin00 = A0;
-int soilMoisturePin01 = A1;
+int waterSensorEchoPin = 8;
+int waterSensorTriggerPin = 9;
+int sensorPowerPin = 5;
+int soilMoisturePin = A0;
 int wakeUpPin = INT0;
 int wifiWakeupPin = 4;
 int wifiReadyPin = 3;
-int currentEndpointId = 0;
-
+int endpointIndex = 0;
 int waterSensorPowerPin = 7;
+int baudRate = 9600;
+
+int s0 = 6;
+int s1 = 13;
+int s2 = 12;
+int s3 = 11;
 
 bool isWifiPowered = false;
 bool isSensorPowered = false;
 
-int baudRate = 9600;
-
 RtcDS3231<TwoWire> Rtc(Wire);
 TemperatureSensor temperatureSensor(&DHT11Pin);
-SoilMoistureSensor soilMoistureSensor00(soilMoisturePin00);
-SoilMoistureSensor soilMoistureSensor01(soilMoisturePin01);
-WaterPump waterPump00(waterPumpPin00, statusLedPin);
-WaterPump waterPump01(waterPumpPin01, statusLedPin);
+
+SoilMoistureSensor soilMoistureSensor00(0);
+SoilMoistureSensor soilMoistureSensor01(1);
+SoilMoistureSensor soilMoistureSensor02(2);
+SoilMoistureSensor soilMoistureSensor03(3);
+SoilMoistureSensor soilMoistureSensor04(4);
+SoilMoistureSensor soilMoistureSensor05(5);
+SoilMoistureSensor soilMoistureSensor06(6);
+SoilMoistureSensor soilMoistureSensor07(7);
+
+WaterPump waterPump00(0, statusLedPin);
+WaterPump waterPump01(1, statusLedPin);
+WaterPump waterPump02(2, statusLedPin);
+WaterPump waterPump03(3, statusLedPin);
+WaterPump waterPump04(4, statusLedPin);
+WaterPump waterPump05(5, statusLedPin);
+WaterPump waterPump06(6, statusLedPin);
+WaterPump waterPump07(7, statusLedPin);
+
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(CYLINDER, 0, 0, 10, 10);
 
-WaterPump waterPumps[NUMBER_OF_DEVICES]{waterPump00, waterPump01};
-SoilMoistureSensor soilMoistureSensors[NUMBER_OF_DEVICES]{soilMoistureSensor00, soilMoisturePin01};
+WaterPump waterPumps[NUMBER_OF_DEVICES]{
+  waterPump00, 
+  waterPump01,
+  waterPump02,
+  waterPump03,
+  waterPump04,
+  waterPump05,
+  waterPump06,
+  waterPump07
+  };
+
+SoilMoistureSensor soilMoistureSensors[NUMBER_OF_DEVICES]{
+  soilMoistureSensor00,
+  soilMoistureSensor01,
+  soilMoistureSensor02,
+  soilMoistureSensor03,
+  soilMoistureSensor04,
+  soilMoistureSensor05,
+  soilMoistureSensor06,
+  soilMoistureSensor07,
+  };
 
 JsonService jsonService;
 ConfigService configService;
@@ -142,7 +178,7 @@ void setup()
 
 void loop()
 {
-  if (digitalRead(wifiReadyPin) == HIGH && currentEndpointId < NUMBER_OF_DEVICES)
+  if (digitalRead(wifiReadyPin) == HIGH && endpointIndex < NUMBER_OF_DEVICES)
   {
     utilities.oscillatePin(statusLedPin, 500, 1);
     Serial.begin(baudRate);
@@ -150,7 +186,7 @@ void loop()
 
     Serial.print(SENSOR_ID);
     Serial.print(" ");
-    Serial.println(currentEndpointId);
+    Serial.println(endpointIndex);
 
     while (!Serial.available())
     {
@@ -159,14 +195,14 @@ void loop()
 
     String configString = Serial.readStringUntil('\n');
     config = jsonService.convertJsonToConfig(configString);
-    // configService.addWakeUpDelay(config.MeasuringIntervalInMinutes, currentEndpointId);
+    // configService.addWakeUpDelay(config.MeasuringIntervalInMinutes, endpointIndex);
 
     // Serial.println("Before toggleSensors");
 
     toggleSensors();
 
-    sensorService.updateSensorParamaters(config, currentEndpointId);
-    SensorReading reading = sensorService.getSensorReadings(currentEndpointId);
+    sensorService.updateSensorParamaters(config, endpointIndex);
+    SensorReading reading = sensorService.getSensorReadings(endpointIndex);
 
     toggleSensors();
 
@@ -176,10 +212,10 @@ void loop()
 
     utilities.oscillatePin(statusLedPin, 500, 2);
 
-    sensorService.water(reading, currentEndpointId);
+    sensorService.water(reading, endpointIndex);
 
-    currentEndpointId++;
-    if (currentEndpointId < NUMBER_OF_DEVICES)
+    endpointIndex++;
+    if (endpointIndex < NUMBER_OF_DEVICES)
     {
       delay(3000);
       yield();
@@ -188,7 +224,7 @@ void loop()
     }
     Serial.end();
   }
-  else if (currentEndpointId == NUMBER_OF_DEVICES)
+  else if (endpointIndex == NUMBER_OF_DEVICES)
   {
     // Serial.begin(baudRate);
     // Serial.println("NUMBER_OF_DEVICES: ");
@@ -205,7 +241,7 @@ void loop()
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
     detachInterrupt(wakeUpPin);
 
-    currentEndpointId = 0;
+    endpointIndex = 0;
 
     utilities.oscillatePin(statusLedPin, 500, 3);
 

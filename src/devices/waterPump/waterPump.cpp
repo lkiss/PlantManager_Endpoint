@@ -10,9 +10,9 @@ WaterPump::WaterPump(int waterPumpPin)
     setupWaterPump();
 }
 
-WaterPump::WaterPump(int waterPumpPin, int statusLedPin)
+WaterPump::WaterPump(int waterPumpIndex, int statusLedPin)
 {
-    this->waterPumpPin = waterPumpPin;
+    this->waterPumpIndex = waterPumpIndex;
     this->statusLedPin = statusLedPin;
     setupWaterPump();
 }

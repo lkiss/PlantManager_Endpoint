@@ -3,9 +3,10 @@
 #include "SoilMoistureSensor.h"
 
 SoilMoistureSensor::SoilMoistureSensor() {}
-SoilMoistureSensor::SoilMoistureSensor(int soilMoisturePin)
+
+SoilMoistureSensor::SoilMoistureSensor(int soilMoistureIndex)
 {
-  this->soilMoisturePin = soilMoisturePin;
+  this->soilMoistureIndex = soilMoistureIndex;
 }
 
 bool SoilMoistureSensor::isDry()

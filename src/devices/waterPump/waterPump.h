@@ -7,13 +7,14 @@ private:
   int waterPumpPin = 0;
   int newWateringTimeInSeconds = 5;
   int statusLedPin = -1;
+  int waterPumpIndex = 0;
 
   void setupWaterPump();
 
 public:
   WaterPump();
   WaterPump(int waterPumpPin);
-  WaterPump(int waterPumpPin, int statusLedPin);
+  WaterPump(int waterPumpIndex, int statusLedPin);
   bool activateWaterPump();
   void updateWateringTime(int &newWateringTimeInSeconds);
 };

@@ -21,7 +21,7 @@ Configuration ConfigService::getConfiguration()
 
 void ConfigService::setConfiguration(Configuration config)
 {
-  for (int deviceNumber = 0; deviceNumber < NUMBER_OF_DEVICES; deviceNumber++)
+  for (int endpointIndex = 0; endpointIndex < NUMBER_OF_DEVICES; endpointIndex++)
   {
     this->config.WateringTimeInSeconds = config.WateringTimeInSeconds;
     this->config.SoilMoistureThreshold = config.SoilMoistureThreshold;
@@ -37,11 +37,11 @@ void ConfigService::addWakeUpDelay(int wakeUpDelay, int indexToPush)
 int ConfigService::getNextWakeUpDelay()
 {
   int closestWakeUpDelayInMinutes = 10080; // one week in minutes
-  for (int deviceNumber = 0; deviceNumber < NUMBER_OF_DEVICES; deviceNumber++)
+  for (int endpointIndex = 0; endpointIndex < NUMBER_OF_DEVICES; endpointIndex++)
   {
-    if (closestWakeUpDelayInMinutes > wakeUpDelays[deviceNumber])
+    if (closestWakeUpDelayInMinutes > wakeUpDelays[endpointIndex])
     {
-      closestWakeUpDelayInMinutes = wakeUpDelays[deviceNumber];
+      closestWakeUpDelayInMinutes = wakeUpDelays[endpointIndex];
     }
   }
   // Serial.println("Closest wakeup delay");

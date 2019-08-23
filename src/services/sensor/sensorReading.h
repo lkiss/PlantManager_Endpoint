@@ -5,7 +5,7 @@
 
 struct SensorReading
 {
-    int deviceNumber;
+    int endpointIndex;
     int temperature;
     int humidity;
     int soilMoisture;

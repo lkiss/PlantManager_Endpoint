@@ -1,5 +1,5 @@
 // #include <SimpleDHT.h>
-#include "temperatureSensor.h"
+#include "./temperatureSensor.h"
 
 DHT dht;
 

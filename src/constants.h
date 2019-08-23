@@ -14,7 +14,7 @@
 #define CONSTANTS
 
 #ifndef NUMBER_OF_DEVICES
-#define NUMBER_OF_DEVICES 2
+#define NUMBER_OF_DEVICES 8
 #endif
 
 enum WaterTankType
