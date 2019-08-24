@@ -1,10 +1,13 @@
-#include <Arduino.h>
 #ifndef WATER_PUMP_SENSOR
 #define WATER_PUMP_SENSOR
+
+#include <Arduino.h>
+#include "../../constants.h"
+
 class WaterPump
 {
 private:
-  int waterPumpPin = 0;
+  int waterPumpPin = MUX_COMMON_PIN;
   int newWateringTimeInSeconds = 5;
   int statusLedPin = -1;
   int waterPumpIndex = 0;

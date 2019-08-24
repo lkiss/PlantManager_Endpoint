@@ -7,13 +7,14 @@ SensorReading SensorService::getSensorReadings(int endpointIndex)
     // Serial.println("Before Reading");
     SensorReading reading;
     TemperatureSensorReading temperatureSensorReading;
-
+    
     temperatureSensorReading = this->temperatureSensor.read();
 
     // Serial.println(temperatureSensorReading.humidity);
     // Serial.println(temperatureSensorReading.temperatureInCelsius);
 
     reading.endpointIndex = endpointIndex;
+    this->mux->channel(endpointIndex);
     reading.soilMoisture = this->soilMoistureSensors[endpointIndex].read();
     reading.waterLevel = this->waterTank.GetRemainingInPercentage(this->waterLevelSensor.getMissingWaterColumHeighCM());
     reading.humidity = temperatureSensorReading.humidity;
@@ -34,7 +35,8 @@ SensorService::SensorService(
     const WaterLevelSensor &waterLevelSensor,
     WaterPump *waterPumps,
     SoilMoistureSensor *soilMoistureSensors,
-    const TemperatureSensor &temperatureSensor)
+    const TemperatureSensor &temperatureSensor,
+    CD74HC4067 &mux)
 {
     this->waterTank = waterTank;
     this->waterLevelSensor = waterLevelSensor;
@@ -42,6 +44,7 @@ SensorService::SensorService(
     this->soilMoistureSensors = soilMoistureSensors;
     this->temperatureSensor = temperatureSensor;
     this->configService = configService;
+    this->mux = &mux;
 }
 
 void SensorService::updateSensorParamaters(Configuration config, int endpointIndex)
@@ -68,6 +71,7 @@ bool SensorService::water(SensorReading reading, int endpointIndex)
     {
         if (this->soilMoistureSensors[endpointIndex].isDry(reading.soilMoisture))
         {
+            this->mux->channel(endpointIndex);
             this->waterPumps[endpointIndex].activateWaterPump();
         }
     }

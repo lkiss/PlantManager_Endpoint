@@ -11,12 +11,12 @@ class SensorService
 {
 private:
   ConfigService configService;
+  CD74HC4067 *mux;
   WaterLevelSensor waterLevelSensor;
   WaterPump *waterPumps;
   SoilMoistureSensor *soilMoistureSensors;
   WaterTank waterTank;
   TemperatureSensor temperatureSensor;
-
 public:
   SensorService();
   SensorService(
@@ -24,7 +24,8 @@ public:
       const WaterLevelSensor &waterLevelSensor,
       WaterPump *waterPumps,
       SoilMoistureSensor *soilMoistureSensors,
-      const TemperatureSensor &temperatureSensor);
+      const TemperatureSensor &temperatureSensor,
+      CD74HC4067 &mux);
   SensorReading getSensorReadings(int endpointIndex);
   bool water(SensorReading reading, int endpointIndex);
   void updateSensorParamaters(Configuration config, int endpointIndex);

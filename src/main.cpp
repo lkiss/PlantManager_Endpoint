@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <RtcDS3231.h>
+#include <CD74HC4067.h>
 #include "LowPower.h"
 
 #include "./devices/devices.h"
@@ -15,7 +16,7 @@ int waterPumpPin01 = 8;
 int waterSensorEchoPin = 8;
 int waterSensorTriggerPin = 9;
 int sensorPowerPin = 5;
-int soilMoisturePin = A0;
+int muxCommonPin = A0;
 int wakeUpPin = INT0;
 int wifiWakeupPin = 4;
 int wifiReadyPin = 3;
@@ -31,6 +32,7 @@ int s3 = 11;
 bool isWifiPowered = false;
 bool isSensorPowered = false;
 
+CD74HC4067 mux(s0, s1, s2, s3);
 RtcDS3231<TwoWire> Rtc(Wire);
 TemperatureSensor temperatureSensor(&DHT11Pin);
 
@@ -80,7 +82,7 @@ SoilMoistureSensor soilMoistureSensors[NUMBER_OF_DEVICES]{
 JsonService jsonService;
 ConfigService configService;
 DataService dataService(configService, jsonService);
-SensorService sensorService(waterTank, waterLevelSensor, waterPumps, soilMoistureSensors, temperatureSensor);
+SensorService sensorService(waterTank, waterLevelSensor, waterPumps, soilMoistureSensors, temperatureSensor, mux);
 
 Utility utilities;
 Configuration config;
@@ -202,6 +204,9 @@ void loop()
     toggleSensors();
 
     sensorService.updateSensorParamaters(config, endpointIndex);
+    pinMode(muxCommonPin, INPUT);
+    delay(50);
+
     SensorReading reading = sensorService.getSensorReadings(endpointIndex);
 
     toggleSensors();
@@ -209,10 +214,12 @@ void loop()
     // Serial.println("After toggleSensors");
 
     jsonService.printSensorReadingJson(reading);
-
     utilities.oscillatePin(statusLedPin, 500, 2);
 
-    sensorService.water(reading, endpointIndex);
+    pinMode(muxCommonPin, OUTPUT);
+    delay(50);
+
+    sensorService.water(reading, endpointIndex + 8);
 
     endpointIndex++;
     if (endpointIndex < NUMBER_OF_DEVICES)

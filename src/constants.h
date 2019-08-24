@@ -17,6 +17,10 @@
 #define NUMBER_OF_DEVICES 8
 #endif
 
+#ifndef MUX_COMMON_PIN
+#define MUX_COMMON_PIN A0
+#endif
+
 enum WaterTankType
 {
     CYLINDER = 0,
