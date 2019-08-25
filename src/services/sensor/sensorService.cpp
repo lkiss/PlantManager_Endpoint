@@ -7,7 +7,7 @@ SensorReading SensorService::getSensorReadings(int endpointIndex)
     // Serial.println("Before Reading");
     SensorReading reading;
     TemperatureSensorReading temperatureSensorReading;
-    
+
     temperatureSensorReading = this->temperatureSensor.read();
 
     // Serial.println(temperatureSensorReading.humidity);
@@ -71,7 +71,7 @@ bool SensorService::water(SensorReading reading, int endpointIndex)
     {
         if (this->soilMoistureSensors[endpointIndex].isDry(reading.soilMoisture))
         {
-            this->mux->channel(endpointIndex);
+            this->mux->channel(endpointIndex + NUMBER_OF_DEVICES);
             this->waterPumps[endpointIndex].activateWaterPump();
         }
     }

@@ -43,6 +43,8 @@ int SoilMoistureSensor::read()
   //Log debug
   int result = 0;
   delay(50);
+  pinMode(MUX_COMMON_PIN, INPUT);
+  delay(50);
   result = analogRead(this->soilMoisturePin);
   delay(50);
   return result;

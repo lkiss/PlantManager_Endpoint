@@ -17,6 +17,14 @@
 #define NUMBER_OF_DEVICES 8
 #endif
 
+#ifndef ANALOG_MAX
+#define ANALOG_MAX 255
+#endif
+
+#ifndef ANALOG_MIN
+#define ANALOG_MIN 0
+#endif
+
 #ifndef MUX_COMMON_PIN
 #define MUX_COMMON_PIN A0
 #endif

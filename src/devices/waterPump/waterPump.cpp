@@ -4,31 +4,30 @@
 
 WaterPump::WaterPump() {}
 
-WaterPump::WaterPump(int waterPumpPin)
-{
-    this->waterPumpPin = waterPumpPin;
-    setupWaterPump();
-}
-
 WaterPump::WaterPump(int waterPumpIndex, int statusLedPin)
 {
     this->waterPumpIndex = waterPumpIndex;
     this->statusLedPin = statusLedPin;
-    setupWaterPump();
 }
 
 bool WaterPump::activateWaterPump()
 {
+    // Serial.println("Before activate");
     bool indicateWatering = this->statusLedPin != -1 ? true : false;
 
     indicateWatering ? digitalWrite(this->statusLedPin, HIGH) : digitalWrite(this->statusLedPin, LOW);
-
-    digitalWrite(this->waterPumpPin, HIGH);
-    delay(this->newWateringTimeInSeconds * 1000);
+    // Serial.println("Before analogWrite");
+    pinMode(MUX_COMMON_PIN, OUTPUT);
+    analogWrite(MUX_COMMON_PIN, ANALOG_MAX);
+    // Serial.println("After analogWrite");
     // Serial.println(this->newWateringTimeInSeconds);
-    digitalWrite(this->waterPumpPin, LOW);
+    delay(this->newWateringTimeInSeconds * 1000);
+    // Serial.println("Before analogWrite");
+    analogWrite(MUX_COMMON_PIN, ANALOG_MIN);
+    // Serial.println("After analogWrite");
 
     indicateWatering ? digitalWrite(this->statusLedPin, LOW) : digitalWrite(this->statusLedPin, LOW);
+    // Serial.println("After activate");
     return true;
 }
 
@@ -37,10 +36,4 @@ void WaterPump::updateWateringTime(int &newWateringTimeInSeconds)
     this->newWateringTimeInSeconds = newWateringTimeInSeconds;
     // Serial.print("Watering time in seconds: ");
     // Serial.println(this->newWateringTimeInSeconds);
-}
-
-void WaterPump::setupWaterPump()
-{
-    pinMode(this->waterPumpPin, OUTPUT);
-    digitalWrite(this->waterPumpPin, LOW);
 }

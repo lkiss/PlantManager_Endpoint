@@ -55,6 +55,9 @@ Configuration JsonService::convertJsonToConfig(String &configJson)
         Serial.println(configJson);
     }
 
+    // Serial.println("Watering time in seconds");
+    // Serial.println(configuration.WateringTimeInSeconds);
+
     jsonDocument.clear();
 
     return configuration;

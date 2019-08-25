@@ -8,20 +8,16 @@
 #include "./constants.h"
 #include "./utility/utility.h"
 
-int statusLedPin = LED_BUILTIN;
+int statusLedPin = 7;
 int numberOfWifiRestAttempts = 0;
 int DHT11Pin = 10;
-int waterPumpPin00 = 9;
-int waterPumpPin01 = 8;
-int waterSensorEchoPin = 8;
-int waterSensorTriggerPin = 9;
+int waterSensorEchoPin = 9;
+int waterSensorTriggerPin = 8;
 int sensorPowerPin = 5;
-int muxCommonPin = A0;
 int wakeUpPin = INT0;
 int wifiWakeupPin = 4;
 int wifiReadyPin = 3;
 int endpointIndex = 0;
-int waterSensorPowerPin = 7;
 int baudRate = 9600;
 
 int s0 = 6;
@@ -58,7 +54,7 @@ WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(CYLINDER, 0, 0, 10, 10);
 
 WaterPump waterPumps[NUMBER_OF_DEVICES]{
-  waterPump00, 
+  waterPump00,
   waterPump01,
   waterPump02,
   waterPump03,
@@ -101,15 +97,14 @@ void toggleSensors()
   if (!isSensorPowered)
   {
     digitalWrite(sensorPowerPin, HIGH);
-    digitalWrite(waterSensorPowerPin, HIGH);
     isSensorPowered = true;
   }
   else
   {
     digitalWrite(sensorPowerPin, LOW);
-    digitalWrite(waterSensorPowerPin, LOW);
     isSensorPowered = false;
   }
+  delay(200);
 }
 
 void updateTimer(int measuringIntervalInMinutes)
@@ -166,16 +161,20 @@ void initializeRtc()
 
 void setup()
 {
-  pinMode(statusLedPin, OUTPUT);
+  utilities.oscillatePin(statusLedPin, 500, 1);
+  // pinMode(statusLedPin, OUTPUT);
   pinMode(sensorPowerPin, OUTPUT);
-  pinMode(waterSensorPowerPin, OUTPUT);
   pinMode(wifiWakeupPin, OUTPUT);
   pinMode(wakeUpPin, INPUT);
   pinMode(wifiReadyPin, INPUT);
+  pinMode(MUX_COMMON_PIN, INPUT);
   Serial.begin(baudRate);
   // Serial.println("Initialize RTC");
   initializeRtc();
+  // Serial.println("Initialize RTC done");
   wakeUpWifi();
+  utilities.oscillatePin(statusLedPin, 500, 2);
+  Serial.flush();
 }
 
 void loop()
@@ -204,8 +203,6 @@ void loop()
     toggleSensors();
 
     sensorService.updateSensorParamaters(config, endpointIndex);
-    pinMode(muxCommonPin, INPUT);
-    delay(50);
 
     SensorReading reading = sensorService.getSensorReadings(endpointIndex);
 
@@ -216,10 +213,7 @@ void loop()
     jsonService.printSensorReadingJson(reading);
     utilities.oscillatePin(statusLedPin, 500, 2);
 
-    pinMode(muxCommonPin, OUTPUT);
-    delay(50);
-
-    sensorService.water(reading, endpointIndex + 8);
+    sensorService.water(reading, endpointIndex);
 
     endpointIndex++;
     if (endpointIndex < NUMBER_OF_DEVICES)

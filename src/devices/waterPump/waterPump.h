@@ -7,7 +7,6 @@
 class WaterPump
 {
 private:
-  int waterPumpPin = MUX_COMMON_PIN;
   int newWateringTimeInSeconds = 5;
   int statusLedPin = -1;
   int waterPumpIndex = 0;
@@ -16,7 +15,6 @@ private:
 
 public:
   WaterPump();
-  WaterPump(int waterPumpPin);
   WaterPump(int waterPumpIndex, int statusLedPin);
   bool activateWaterPump();
   void updateWateringTime(int &newWateringTimeInSeconds);

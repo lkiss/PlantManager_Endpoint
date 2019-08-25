@@ -11,12 +11,12 @@ class SensorService
 {
 private:
   ConfigService configService;
-  CD74HC4067 *mux;
   WaterLevelSensor waterLevelSensor;
   WaterPump *waterPumps;
   SoilMoistureSensor *soilMoistureSensors;
   WaterTank waterTank;
   TemperatureSensor temperatureSensor;
+  CD74HC4067 *mux;
 public:
   SensorService();
   SensorService(
