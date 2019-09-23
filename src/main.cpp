@@ -34,45 +34,33 @@ TemperatureSensor temperatureSensor(&DHT11Pin);
 
 SoilMoistureSensor soilMoistureSensor00(0);
 SoilMoistureSensor soilMoistureSensor01(1);
-SoilMoistureSensor soilMoistureSensor02(2);
-SoilMoistureSensor soilMoistureSensor03(3);
-SoilMoistureSensor soilMoistureSensor04(4);
-SoilMoistureSensor soilMoistureSensor05(5);
-SoilMoistureSensor soilMoistureSensor06(6);
-SoilMoistureSensor soilMoistureSensor07(7);
+// SoilMoistureSensor soilMoistureSensor02(2);
+// SoilMoistureSensor soilMoistureSensor03(3);
+// SoilMoistureSensor soilMoistureSensor04(4);
+// SoilMoistureSensor soilMoistureSensor05(5);
+// SoilMoistureSensor soilMoistureSensor06(6);
+// SoilMoistureSensor soilMoistureSensor07(7);
 
 WaterPump waterPump00(0, statusLedPin);
 WaterPump waterPump01(1, statusLedPin);
-WaterPump waterPump02(2, statusLedPin);
-WaterPump waterPump03(3, statusLedPin);
-WaterPump waterPump04(4, statusLedPin);
-WaterPump waterPump05(5, statusLedPin);
-WaterPump waterPump06(6, statusLedPin);
-WaterPump waterPump07(7, statusLedPin);
+// WaterPump waterPump02(2, statusLedPin);
+// WaterPump waterPump03(3, statusLedPin);
+// WaterPump waterPump04(4, statusLedPin);
+// WaterPump waterPump05(5, statusLedPin);
+// WaterPump waterPump06(6, statusLedPin);
+// WaterPump waterPump07(7, statusLedPin);
 
 WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(CYLINDER, 0, 0, 10, 10);
 
 WaterPump waterPumps[NUMBER_OF_DEVICES]{
   waterPump00,
-  waterPump01,
-  waterPump02,
-  waterPump03,
-  waterPump04,
-  waterPump05,
-  waterPump06,
-  waterPump07
+  waterPump01
   };
 
 SoilMoistureSensor soilMoistureSensors[NUMBER_OF_DEVICES]{
   soilMoistureSensor00,
   soilMoistureSensor01,
-  soilMoistureSensor02,
-  soilMoistureSensor03,
-  soilMoistureSensor04,
-  soilMoistureSensor05,
-  soilMoistureSensor06,
-  soilMoistureSensor07,
   };
 
 JsonService jsonService;

@@ -71,7 +71,7 @@ bool SensorService::water(SensorReading reading, int endpointIndex)
     {
         if (this->soilMoistureSensors[endpointIndex].isDry(reading.soilMoisture))
         {
-            this->mux->channel(endpointIndex + NUMBER_OF_DEVICES);
+            this->mux->channel(endpointIndex + MUX_DEVICE_SHIFT);
             this->waterPumps[endpointIndex].activateWaterPump();
         }
     }

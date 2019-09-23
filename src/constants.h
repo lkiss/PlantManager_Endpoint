@@ -14,7 +14,11 @@
 #define CONSTANTS
 
 #ifndef NUMBER_OF_DEVICES
-#define NUMBER_OF_DEVICES 8
+#define NUMBER_OF_DEVICES 2
+#endif
+
+#ifndef MUX_DEVICE_SHIFT
+#define MUX_DEVICE_SHIFT 8
 #endif
 
 #ifndef ANALOG_MAX
