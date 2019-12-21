@@ -5,10 +5,10 @@
 
 struct Configuration
 {
-  int SoilMoistureThreshold;
+  int IdealSoilMoistureValue;
   int WateringTimeInSeconds;
   int MeasuringIntervalInMinutes;
-  double MinimumWaterThresholdPercentage;
+  double WaterLevelInPercentage;
   DimensionsInCentimeters WaterTankDimensions;
   WaterTankType TankType;
 };

@@ -22,9 +22,9 @@ WaterTank::WaterTank(WaterTankType tankType, double lengthCM, double widthCM, do
     CalculateCapacityCC();
 }
 
-void WaterTank::UpdateWaterTresholdValue(double minimumWaterThresholdPercentage)
+void WaterTank::UpdateWaterTresholdValue(double WaterLevelInPercentage)
 {
-    this->minimumWaterThresholdPercentage = minimumWaterThresholdPercentage;
+    this->WaterLevelInPercentage = WaterLevelInPercentage;
 }
 
 double WaterTank::CalculateVolume(double height)
@@ -95,7 +95,7 @@ double WaterTank::GetRemainingInPercentage(double height)
 
 bool WaterTank::IsWaterLevelSufficient(double remainingWaterInPercentage)
 {
-    return this->minimumWaterThresholdPercentage >= remainingWaterInPercentage || remainingWaterInPercentage == -1 ? false : true;
+    return this->WaterLevelInPercentage >= remainingWaterInPercentage || remainingWaterInPercentage == -1 ? false : true;
 }
 
 void WaterTank::UpdateWaterTankDimensions(WaterTankType tankType, DimensionsInCentimeters dimensions)

@@ -24,7 +24,7 @@ void ConfigService::setConfiguration(Configuration config)
   for (int endpointIndex = 0; endpointIndex < NUMBER_OF_DEVICES; endpointIndex++)
   {
     this->config.WateringTimeInSeconds = config.WateringTimeInSeconds;
-    this->config.SoilMoistureThreshold = config.SoilMoistureThreshold;
+    this->config.IdealSoilMoistureValue = config.IdealSoilMoistureValue;
     this->config.MeasuringIntervalInMinutes = config.MeasuringIntervalInMinutes;
   }
 }

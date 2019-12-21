@@ -38,16 +38,16 @@ Configuration JsonService::convertJsonToConfig(String &configJson)
 
     if (!error)
     {
-        configuration.SoilMoistureThreshold = jsonDocument["ismv"].as<int>();
+        configuration.IdealSoilMoistureValue = jsonDocument["ismv"].as<int>();
         configuration.WateringTimeInSeconds = jsonDocument["wtis"].as<int>();
         configuration.MeasuringIntervalInMinutes = jsonDocument["miim"].as<int>();
-        configuration.MinimumWaterThresholdPercentage = jsonDocument["mwtp"].as<double>();
+        configuration.WaterLevelInPercentage = jsonDocument["wlip"].as<double>();
 
-        configuration.WaterTankDimensions.Width = jsonDocument["wtwicm"].as<double>();
-        configuration.WaterTankDimensions.Length = jsonDocument["wtlicm"].as<double>();
-        configuration.WaterTankDimensions.Height = jsonDocument["wthicm"].as<double>();
-        configuration.WaterTankDimensions.Radius = jsonDocument["wtricm"].as<double>();
-        configuration.TankType = jsonDocument["wtt"].as<int>();
+        configuration.WaterTankDimensions.Width = jsonDocument["wic"].as<double>();
+        configuration.WaterTankDimensions.Length = jsonDocument["lic"].as<double>();
+        configuration.WaterTankDimensions.Height = jsonDocument["hic"].as<double>();
+        configuration.WaterTankDimensions.Radius = jsonDocument["ric"].as<double>();
+        configuration.TankType = jsonDocument["tt"].as<int>();
     }
     else
     {

@@ -51,15 +51,15 @@ void SensorService::updateSensorParamaters(Configuration config, int endpointInd
 {
     // Serial.println("Config");
     // Serial.println(config.WateringTimeInSeconds);
-    // Serial.println(config.SoilMoistureThreshold);
-    // Serial.println(config.MinimumWaterThresholdPercentage);
+    // Serial.println(config.IdealSoilMoistureValue);
+    // Serial.println(config.WaterLevelInPercentage);
     // Serial.println("-------------");
     // Serial.println("endpointIndex");
     // Serial.println(endpointIndex);
 
     this->waterPumps[endpointIndex].updateWateringTime(config.WateringTimeInSeconds);
-    this->soilMoistureSensors[endpointIndex].updateTresholdValues(config.SoilMoistureThreshold);
-    this->waterTank.UpdateWaterTresholdValue(config.MinimumWaterThresholdPercentage);
+    this->soilMoistureSensors[endpointIndex].updateTresholdValues(config.IdealSoilMoistureValue);
+    this->waterTank.UpdateWaterTresholdValue(config.WaterLevelInPercentage);
     this->waterTank.UpdateWaterTankDimensions(config.TankType, config.WaterTankDimensions);
 
     // Serial.println("After updateSensorParamaters");
