@@ -2,12 +2,12 @@
 #define PI 3.14
 #endif
 
-#ifndef SENSOR_ID
-#define SENSOR_ID "a8997fcd-328e-43f7-98b0-4c75390f89c6"
+#ifndef DEVICE_ID
+#define DEVICE_ID "a8997fcd-328e-43f7-98b0-4c75390f89c6"
 #endif
 
-#ifndef SENSOR_TYPE
-#define SENSOR_TYPE TYPE01
+#ifndef DEVICE_TYPE
+#define DEVICE_TYPE 1
 #endif
 
 #ifndef CONSTANTS

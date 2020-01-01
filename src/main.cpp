@@ -173,7 +173,7 @@ void loop()
     Serial.begin(baudRate);
     Serial.setTimeout(10000);
 
-    Serial.print(SENSOR_ID);
+    Serial.print(DEVICE_ID);
     Serial.print(" ");
     Serial.println(endpointIndex);
 
