@@ -3,7 +3,7 @@
 #endif
 
 #ifndef DEVICE_ID
-#define DEVICE_ID "a8997fcd-328e-43f7-98b0-4c75390f89c6"
+#define DEVICE_ID "a8997fcd-328e-43f7-98b0-4c75390f89c10"
 #endif
 
 #ifndef DEVICE_TYPE

@@ -31,9 +31,10 @@ String JsonService::convertConfigToJson(Configuration configuration)
 Configuration JsonService::convertJsonToConfig(String &configJson)
 {
     Configuration configuration;
-    const size_t capacity  = JSON_OBJECT_SIZE(9);
+    const size_t capacity = JSON_OBJECT_SIZE(9);
 
     DynamicJsonDocument jsonDocument(capacity);
+    const String originalJson = configJson.c_str();
     const DeserializationError error = deserializeJson(jsonDocument, const_cast<char *>(configJson.c_str()));
 
     if (!error)
@@ -41,18 +42,18 @@ Configuration JsonService::convertJsonToConfig(String &configJson)
         configuration.IdealSoilMoistureValue = jsonDocument["ismv"].as<int>();
         configuration.WateringTimeInSeconds = jsonDocument["wtis"].as<int>();
         configuration.MeasuringIntervalInMinutes = jsonDocument["miim"].as<int>();
-        configuration.WaterLevelInPercentage = jsonDocument["wlip"].as<double>();
+        configuration.WaterLevelInPercentage = jsonDocument["mwtp"].as<double>();
 
-        configuration.WaterTankDimensions.Width = jsonDocument["wic"].as<double>();
-        configuration.WaterTankDimensions.Length = jsonDocument["lic"].as<double>();
-        configuration.WaterTankDimensions.Height = jsonDocument["hic"].as<double>();
-        configuration.WaterTankDimensions.Radius = jsonDocument["ric"].as<double>();
-        configuration.TankType = jsonDocument["tt"].as<int>();
+        configuration.WaterTankDimensions.Width = jsonDocument["wtw"].as<double>();
+        configuration.WaterTankDimensions.Length = jsonDocument["wtl"].as<double>();
+        configuration.WaterTankDimensions.Height = jsonDocument["wth"].as<double>();
+        configuration.WaterTankDimensions.Radius = jsonDocument["wtr"].as<double>();
+        configuration.TankType = jsonDocument["wtt"].as<int>();
     }
     else
     {
-        Serial.println("Parse failed for configJson");
-        Serial.println(configJson);
+        const String errorMessage = "Parse failed for configJson: ";
+        Serial.print(errorMessage + originalJson);
     }
 
     // Serial.println("Watering time in seconds");
