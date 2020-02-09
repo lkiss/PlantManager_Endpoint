@@ -9,6 +9,8 @@ class Utility
     Utility();
 
     void oscillatePin(uint8_t pinNumber, int frequencyInMilliseconds, uint8_t repetitions);
+    void sendMessageAndWait(String message);
+    void waitMessage(String message);
 };
 
 #endif

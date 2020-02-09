@@ -149,7 +149,7 @@ void initializeRtc()
 
 void setup()
 {
-  utilities.oscillatePin(statusLedPin, 500, 1);
+  // utilities.oscillatePin(statusLedPin, 500, 1);
   // pinMode(statusLedPin, OUTPUT);
   pinMode(sensorPowerPin, OUTPUT);
   pinMode(wifiWakeupPin, OUTPUT);
@@ -161,7 +161,7 @@ void setup()
   initializeRtc();
   // Serial.println("Initialize RTC done");
   wakeUpWifi();
-  utilities.oscillatePin(statusLedPin, 500, 2);
+  // utilities.oscillatePin(statusLedPin, 500, 2);
   Serial.flush();
 }
 
@@ -169,13 +169,16 @@ void loop()
 {
   if (digitalRead(wifiReadyPin) == HIGH && endpointIndex < NUMBER_OF_DEVICES)
   {
-    utilities.oscillatePin(statusLedPin, 500, 1);
     Serial.begin(baudRate);
-    Serial.setTimeout(10000);
+    utilities.sendMessageAndWait("CONFIG_GET");
 
     Serial.print(DEVICE_ID);
     Serial.print(" ");
     Serial.println(endpointIndex);
+
+    // utilities.oscillatePin(statusLedPin, 500, 1);
+
+    utilities.waitMessage("CONFIG_SUCCESS");
 
     while (!Serial.available())
     {
@@ -198,8 +201,10 @@ void loop()
 
     // Serial.println("After toggleSensors");
 
+    utilities.sendMessageAndWait("READING_SET");
+
     jsonService.printSensorReadingJson(reading);
-    utilities.oscillatePin(statusLedPin, 500, 2);
+    // utilities.oscillatePin(statusLedPin, 500, 2);
 
     sensorService.water(reading, endpointIndex);
 
@@ -224,7 +229,7 @@ void loop()
 
     updateTimer(config.MeasuringIntervalInMinutes);
 
-    utilities.oscillatePin(statusLedPin, 500, 3);
+    // utilities.oscillatePin(statusLedPin, 500, 3);
 
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
@@ -232,7 +237,7 @@ void loop()
 
     endpointIndex = 0;
 
-    utilities.oscillatePin(statusLedPin, 500, 3);
+    // utilities.oscillatePin(statusLedPin, 500, 3);
 
     wakeUpWifi();
 
