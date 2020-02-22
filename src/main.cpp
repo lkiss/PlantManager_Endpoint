@@ -28,6 +28,14 @@ int s3 = 11;
 bool isWifiPowered = false;
 bool isSensorPowered = false;
 
+String serialMessage = "";
+char inChar = "";
+int terminatorCharacterCount = 0;
+
+bool isConfigSuccess = false;
+bool isWifiReady = false;
+bool isPayload = false;
+
 CD74HC4067 mux(s0, s1, s2, s3);
 RtcDS3231<TwoWire> Rtc(Wire);
 TemperatureSensor temperatureSensor(&DHT11Pin);
@@ -54,14 +62,13 @@ WaterLevelSensor waterLevelSensor(waterSensorTriggerPin, waterSensorEchoPin);
 WaterTank waterTank(CYLINDER, 0, 0, 10, 10);
 
 WaterPump waterPumps[NUMBER_OF_DEVICES]{
-  waterPump00,
-  waterPump01
-  };
+    waterPump00,
+    waterPump01};
 
 SoilMoistureSensor soilMoistureSensors[NUMBER_OF_DEVICES]{
-  soilMoistureSensor00,
-  soilMoistureSensor01,
-  };
+    soilMoistureSensor00,
+    soilMoistureSensor01,
+};
 
 JsonService jsonService;
 ConfigService configService;
@@ -149,7 +156,6 @@ void initializeRtc()
 
 void setup()
 {
-  utilities.oscillatePin(statusLedPin, 500, 1);
   // pinMode(statusLedPin, OUTPUT);
   pinMode(sensorPowerPin, OUTPUT);
   pinMode(wifiWakeupPin, OUTPUT);
@@ -157,49 +163,33 @@ void setup()
   pinMode(wifiReadyPin, INPUT);
   pinMode(MUX_COMMON_PIN, INPUT);
   Serial.begin(baudRate);
+  Serial.setTimeout(5000);
   // Serial.println("Initialize RTC");
   initializeRtc();
   // Serial.println("Initialize RTC done");
   wakeUpWifi();
-  utilities.oscillatePin(statusLedPin, 500, 2);
   Serial.flush();
 }
 
 void loop()
 {
-  if (digitalRead(wifiReadyPin) == HIGH && endpointIndex < NUMBER_OF_DEVICES)
+  if (isConfigSuccess && isPayload)
   {
-    utilities.oscillatePin(statusLedPin, 500, 1);
-    Serial.begin(baudRate);
-    Serial.setTimeout(10000);
-
-    Serial.print(DEVICE_ID);
-    Serial.print(" ");
-    Serial.println(endpointIndex);
-
-    while (!Serial.available())
-    {
-      yield();
-    }
-
-    String configString = Serial.readStringUntil('\n');
-    config = jsonService.convertJsonToConfig(configString);
-    // configService.addWakeUpDelay(config.MeasuringIntervalInMinutes, endpointIndex);
-
-    // Serial.println("Before toggleSensors");
+    // String configString = Serial.readStringUntil('\n');
+    config = jsonService.convertJsonToConfig(serialMessage);
 
     toggleSensors();
 
     sensorService.updateSensorParamaters(config, endpointIndex);
-
     SensorReading reading = sensorService.getSensorReadings(endpointIndex);
 
     toggleSensors();
 
-    // Serial.println("After toggleSensors");
+    Serial.print("*READING_SUCCESS*");
 
     jsonService.printSensorReadingJson(reading);
-    utilities.oscillatePin(statusLedPin, 500, 2);
+
+    Serial.flush();
 
     sensorService.water(reading, endpointIndex);
 
@@ -209,11 +199,27 @@ void loop()
       delay(3000);
       yield();
       wakeUpWifi();
-      delay(3000);
     }
-    Serial.end();
+
+    isConfigSuccess = false;
+    isPayload = false;
+    serialMessage = "";
   }
-  else if (endpointIndex == NUMBER_OF_DEVICES)
+
+  if (isWifiReady && endpointIndex < NUMBER_OF_DEVICES)
+  {
+    Serial.print("*SENSOR_ID_SUCCESS*");
+    Serial.print("*");
+    Serial.print(DEVICE_ID);
+    Serial.print(" ");
+    Serial.print(endpointIndex);
+    Serial.print("*");
+    Serial.flush();
+
+    isWifiReady = false;
+  }
+
+  if (endpointIndex == NUMBER_OF_DEVICES)
   {
     // Serial.begin(baudRate);
     // Serial.println("NUMBER_OF_DEVICES: ");
@@ -224,22 +230,72 @@ void loop()
 
     updateTimer(config.MeasuringIntervalInMinutes);
 
-    utilities.oscillatePin(statusLedPin, 500, 3);
-
     attachInterrupt(wakeUpPin, wakeUp, FALLING);
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
     detachInterrupt(wakeUpPin);
 
     endpointIndex = 0;
 
-    utilities.oscillatePin(statusLedPin, 500, 3);
-
     wakeUpWifi();
 
     // Serial.begin(baudRate);
-    // Serial.println("Wakeup");
+    Serial.println("Wakeup");
     // Serial.end();
 
     delay(3000);
+  }
+}
+
+void serialEvent()
+{
+  while (Serial.available())
+  {
+    inChar = (char)Serial.read();
+
+    // Serial.print(inChar);
+
+    if (terminatorCharacterCount == 1)
+    {
+      if (inChar != '*')
+      {
+        serialMessage += inChar;
+      }
+    }
+
+    // Serial.print(serialMessage);
+
+    if (inChar == '*')
+    {
+      terminatorCharacterCount++;
+    }
+
+    if (terminatorCharacterCount == 2)
+    {
+      while (Serial.available())
+      {
+        Serial.read();
+      }
+
+      Serial.flush();
+      if (serialMessage.length() != 0)
+      {
+        Serial.print(serialMessage);
+        if (serialMessage == "CONFIG_SUCCESS")
+        {
+          isConfigSuccess = true;
+          serialMessage = "";
+        }
+        else if (serialMessage == "WIFI_READY")
+        {
+          isWifiReady = true;
+          serialMessage = "";
+        }
+        else
+        {
+          isPayload = true;
+        }
+      }
+      terminatorCharacterCount = 0;
+    }
   }
 }

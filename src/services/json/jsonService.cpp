@@ -12,7 +12,9 @@ void JsonService::printSensorReadingJson(SensorReading sensorReading)
     reading["humidity"] = sensorReading.humidity;
     reading["temperature"] = sensorReading.temperature;
 
+    Serial.print("*");
     serializeJson(jsonDocument, Serial);
+    Serial.print("*");
 
     jsonDocument.clear();
 }
