@@ -29,7 +29,7 @@ bool isWifiPowered = false;
 bool isSensorPowered = false;
 
 String serialMessage = "";
-char inChar = "";
+char inChar = ' ';
 int terminatorCharacterCount = 0;
 
 bool isConfigSuccess = false;
@@ -173,76 +173,68 @@ void setup()
 
 void loop()
 {
-  if (isConfigSuccess && isPayload)
+  if (digitalRead(wifiReadyPin) == HIGH)
   {
-    // String configString = Serial.readStringUntil('\n');
-    config = jsonService.convertJsonToConfig(serialMessage);
-
-    toggleSensors();
-
-    sensorService.updateSensorParamaters(config, endpointIndex);
-    SensorReading reading = sensorService.getSensorReadings(endpointIndex);
-
-    toggleSensors();
-
-    Serial.print("*READING_SUCCESS*");
-
-    jsonService.printSensorReadingJson(reading);
-
-    Serial.flush();
-
-    sensorService.water(reading, endpointIndex);
-
-    endpointIndex++;
-    if (endpointIndex < NUMBER_OF_DEVICES)
+    if (isConfigSuccess && isPayload)
     {
+      // String configString = Serial.readStringUntil('\n');
+      config = jsonService.convertJsonToConfig(serialMessage);
+
+      toggleSensors();
+
+      sensorService.updateSensorParamaters(config, endpointIndex);
+      SensorReading reading = sensorService.getSensorReadings(endpointIndex);
+
+      toggleSensors();
+
+      Serial.print("*READING_SUCCESS*");
+
+      jsonService.printSensorReadingJson(reading);
+
+      Serial.flush();
       delay(3000);
-      yield();
-      wakeUpWifi();
+
+      sensorService.water(reading, endpointIndex);
+
+      endpointIndex++;
+      if (endpointIndex < NUMBER_OF_DEVICES)
+      {
+        wakeUpWifi();
+      }
+
+      isConfigSuccess = false;
+      isPayload = false;
+      serialMessage = "";
     }
 
-    isConfigSuccess = false;
-    isPayload = false;
-    serialMessage = "";
-  }
+    if (isWifiReady && endpointIndex < NUMBER_OF_DEVICES)
+    {
+      Serial.print("*SENSOR_ID_SUCCESS*");
+      Serial.print("*");
+      Serial.print(DEVICE_ID);
+      Serial.print(" ");
+      Serial.print(endpointIndex);
+      Serial.print("*");
+      Serial.flush();
 
-  if (isWifiReady && endpointIndex < NUMBER_OF_DEVICES)
-  {
-    Serial.print("*SENSOR_ID_SUCCESS*");
-    Serial.print("*");
-    Serial.print(DEVICE_ID);
-    Serial.print(" ");
-    Serial.print(endpointIndex);
-    Serial.print("*");
-    Serial.flush();
+      isWifiReady = false;
+    }
 
-    isWifiReady = false;
-  }
+    if (endpointIndex == NUMBER_OF_DEVICES)
+    {
+      // Serial.print("Go sleep");
+      Serial.end();
+      updateTimer(config.MeasuringIntervalInMinutes);
 
-  if (endpointIndex == NUMBER_OF_DEVICES)
-  {
-    // Serial.begin(baudRate);
-    // Serial.println("NUMBER_OF_DEVICES: ");
-    // Serial.println(NUMBER_OF_DEVICES);
-    // Serial.println("MeasurinIntervalInMinutes");
-    // Serial.println(config.MeasuringIntervalInMinutes);
-    // Serial.end();
+      attachInterrupt(wakeUpPin, wakeUp, FALLING);
+      LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+      detachInterrupt(wakeUpPin);
 
-    updateTimer(config.MeasuringIntervalInMinutes);
-
-    attachInterrupt(wakeUpPin, wakeUp, FALLING);
-    LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
-    detachInterrupt(wakeUpPin);
-
-    endpointIndex = 0;
-
-    wakeUpWifi();
-
-    // Serial.begin(baudRate);
-    Serial.println("Wakeup");
-    // Serial.end();
-
-    delay(3000);
+      endpointIndex = 0;
+      Serial.begin(baudRate);
+      // Serial.print("WakeUp");
+      wakeUpWifi();
+    }
   }
 }
 
@@ -279,7 +271,7 @@ void serialEvent()
       Serial.flush();
       if (serialMessage.length() != 0)
       {
-        Serial.print(serialMessage);
+        // Serial.print(serialMessage);
         if (serialMessage == "CONFIG_SUCCESS")
         {
           isConfigSuccess = true;
